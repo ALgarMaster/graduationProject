@@ -7,7 +7,13 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -60,12 +66,40 @@ public class TelegramBot extends TelegramLongPollingBot{
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatID));
         message.setText(textToSend);
+
+
+
+
+        message.setReplyMarkup(standartChoseKeyboard());
         try {
             execute(message);
         }catch (TelegramApiException e){
             log.error("Error tg exception" + e.getMessage());
         }
     }
+
+    public ReplyKeyboardMarkup standartChoseKeyboard(){
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+
+        KeyboardRow row = new KeyboardRow(){{
+            add("назад");
+            add("выбрать");
+        }};
+
+        keyboardRows.add(row);
+
+        row = new KeyboardRow(){{
+            add("связатся с продавцом");
+        }};
+
+        keyboardRows.add(row);
+
+        keyboardMarkup.setKeyboard(keyboardRows);
+        return keyboardMarkup;
+    }
+
 
 
     @Override
