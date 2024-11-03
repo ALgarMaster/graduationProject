@@ -2,6 +2,9 @@ package com.example.graduationProject.config;
 
 
 import com.example.graduationProject.service.TelegramBot;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -10,9 +13,11 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+@Slf4j
 @Component
 public class BotInitializer {
 
+    private static final Logger log = LoggerFactory.getLogger(BotInitializer.class);
     @Autowired
     TelegramBot bot;
 
@@ -23,7 +28,7 @@ public class BotInitializer {
         try{
             tgBotsApi.registerBot(bot);
         }catch (TelegramApiException e){
-
+            log.error("Error tg api exception" + e.getMessage());
         }
 
     }
