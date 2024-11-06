@@ -1,24 +1,22 @@
 package com.example.graduationProject.entities;
 
-import com.example.graduationProject.enumeration.COLORCOMBO;
-import com.example.graduationProject.enumeration.FORWHOM;
+import com.example.graduationProject.enumeration.COLOR_COMBO;
+import com.example.graduationProject.enumeration.FOR_WHOM;
 import com.example.graduationProject.enumeration.SUBJECT;
-import com.example.graduationProject.enumeration.TYPEORDER;
-
-import java.util.random.RandomGenerator;
+import com.example.graduationProject.enumeration.TYPE_ORDER;
 
 public class Order {
-    private TYPEORDER type;
+    private TYPE_ORDER type;
     private byte size;
-    private FORWHOM fromWhom;
+    private FOR_WHOM fromWhom;
     private SUBJECT subject;
-    private COLORCOMBO color;
+    private COLOR_COMBO color;
 
-    public TYPEORDER getType() {
+    public TYPE_ORDER getType() {
         return type;
     }
 
-    public void setType(TYPEORDER type) {
+    public void setType(TYPE_ORDER type) {
         this.type = type;
     }
 
@@ -30,11 +28,11 @@ public class Order {
         this.size = size;
     }
 
-    public FORWHOM getFromWhom() {
+    public FOR_WHOM getFromWhom() {
         return fromWhom;
     }
 
-    public void setFromWhom(FORWHOM fromWhom) {
+    public void setFromWhom(FOR_WHOM fromWhom) {
         this.fromWhom = fromWhom;
     }
 
@@ -46,11 +44,11 @@ public class Order {
         this.subject = subject;
     }
 
-    public COLORCOMBO getColor() {
+    public COLOR_COMBO getColor() {
         return color;
     }
 
-    public void setColor(COLORCOMBO color) {
+    public void setColor(COLOR_COMBO color) {
         this.color = color;
     }
 }

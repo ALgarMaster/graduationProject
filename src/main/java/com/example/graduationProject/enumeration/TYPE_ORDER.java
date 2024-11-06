@@ -1,4 +1,5 @@
 package com.example.graduationProject.enumeration;
 
-public enum COLORCOMBO {
+public enum TYPE_ORDER {
+    BASKET,PALLET,BOUQUET
 }

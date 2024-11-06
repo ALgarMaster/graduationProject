@@ -1,5 +1,5 @@
 package com.example.graduationProject.enumeration;
 
-public enum TYPEORDER {
-    BASKET,PALLET,BOUQUET
+public enum FOR_WHOM {
+    HE, SHE, NOTHING
 }

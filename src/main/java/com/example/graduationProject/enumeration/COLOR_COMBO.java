@@ -1,5 +1,4 @@
 package com.example.graduationProject.enumeration;
 
-public enum FORWHOM {
-    HE, SHE, NOTHING
+public enum COLOR_COMBO {
 }
