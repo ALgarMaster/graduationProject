@@ -68,7 +68,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
-        message.setReplyMarkup(inlineKeyboard.addDefaultLine(inlineKeyboard));
+        message.setReplyMarkup(inlineKeyboard.typeInlineKeyboard(inlineKeyboard));
         try {
             execute(message);
         }catch (TelegramApiException e){
@@ -76,27 +76,27 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    public ReplyKeyboardMarkup standartChoseKeyboard(){
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-
-        KeyboardRow row = new KeyboardRow(){{
-            add("назад");
-            add("выбрать");
-        }};
-
-        keyboardRows.add(row);
-
-        row = new KeyboardRow(){{
-            add("связатся с продавцом");
-        }};
-
-        keyboardRows.add(row);
-
-        keyboardMarkup.setKeyboard(keyboardRows);
-        return keyboardMarkup;
-    }
+//    public ReplyKeyboardMarkup standartChoseKeyboard(){
+//        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+//
+//        List<KeyboardRow> keyboardRows = new ArrayList<>();
+//
+//        KeyboardRow row = new KeyboardRow(){{
+//            add("назад");
+//            add("выбрать");
+//        }};
+//
+//        keyboardRows.add(row);
+//
+//        row = new KeyboardRow(){{
+//            add("связатся с продавцом");
+//        }};
+//
+//        keyboardRows.add(row);
+//
+//        keyboardMarkup.setKeyboard(keyboardRows);
+//        return keyboardMarkup;
+//    }
 
 
 

@@ -9,7 +9,12 @@ import java.util.List;
 
 public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
-    ArrayList<List<InlineKeyboardButton>> rowsInLine;
+    List<List<InlineKeyboardButton>> rowsInLine;
+
+    CustomInlineKeyboardMarkup(){
+
+        rowsInLine = new ArrayList<>();
+    }
 
 
     public InlineKeyboardMarkup addDefaultLine(InlineKeyboardMarkup inlineKeyboard){
@@ -32,7 +37,7 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         InlineKeyboardButton bouquetButton = createInlineKeyboardButtonSetTextAndSetCallBack("Букет", "/bouquet");
 
         addRowsInLine(basketButton, palletButton, bouquetButton);
-        addDefaultLine(inlineKeyboard);
+        inlineKeyboard = addDefaultLine(inlineKeyboard);
 
         return inlineKeyboard;
     }
