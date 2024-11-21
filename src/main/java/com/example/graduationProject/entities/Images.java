@@ -1,7 +1,14 @@
 package com.example.graduationProject.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "images")
 public class Images {
@@ -12,8 +19,6 @@ public class Images {
 
     private String file_name;
     private String file_src;
-
-    public Images(){};
 
     public Images(String file_name, String file_src){
         this.file_name = file_name;

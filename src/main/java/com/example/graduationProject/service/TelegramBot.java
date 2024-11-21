@@ -1,7 +1,9 @@
 package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
+import com.example.graduationProject.entities.Images;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,15 +26,17 @@ public class TelegramBot extends TelegramLongPollingBot{
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
 
-    private DBConfig dbConfig;
+//    private DBConfig dbConfig;
+//
+//    Connection connection = dbConfig.getConnection();
 
-    Connection connection = dbConfig.getConnection();
+
 
 
     public TelegramBot(BotConfiguration configuration, DBConfig dbConfig) throws SQLException {
         this.botConfiguration = configuration;
-        this.dbConfig = dbConfig;
-        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
+//        this.dbConfig = dbConfig;
+//        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
     }
 
 
@@ -46,8 +50,20 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             switch (messageText){
                 case "/start":
+//                    Configuration configuration = new Configuration();
+//                    configuration.configure();
 
-                    try {
+
+                    try
+//                            (var sessionFactory = configuration.buildSessionFactory();
+//                        var session = sessionFactory.openSession();
+//                    )
+                    {
+//                        session.beginTransaction();
+//
+//                        session.save(new Images("eopgnwoengoiwe", "//eopgnwoengoiwe.png"));
+//
+//                        session.getTransaction().commit();
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
                     }catch (Exception e){
                         log.error("Error main bot" + e.getMessage());
@@ -77,7 +93,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatID));
         message.setText(textToSend);
-        checkDatabaseConnection();
+//        checkDatabaseConnection();
 
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
@@ -111,17 +127,17 @@ public class TelegramBot extends TelegramLongPollingBot{
 //        return keyboardMarkup;
 //    }
 
-    public void checkDatabaseConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                log.info("Database connection is active!");
-            } else {
-                log.warn("Database connection is not active.");
-            }
-        } catch (SQLException e) {
-            log.error("Error checking database connection: " + e.getMessage());
-        }
-    }
+//    public void checkDatabaseConnection() {
+//        try {
+//            if (connection != null && !connection.isClosed()) {
+//                log.info("Database connection is active!");
+//            } else {
+//                log.warn("Database connection is not active.");
+//            }
+//        } catch (SQLException e) {
+//            log.error("Error checking database connection: " + e.getMessage());
+//        }
+//    }
 
     @Override
     public String getBotUsername() {
