@@ -11,10 +11,12 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
     List<List<InlineKeyboardButton>> rowsInLine;
 
+
     CustomInlineKeyboardMarkup(){
 
         rowsInLine = new ArrayList<>();
     }
+
 
 
     public InlineKeyboardMarkup addDefaultLine(InlineKeyboardMarkup inlineKeyboard){
@@ -61,6 +63,17 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         InlineKeyboardButton multipurposeButton = createInlineKeyboardButtonSetTextAndSetCallBack("Универсальный", "/for_multipurpose");
 
         addRowsInLine(himButton, herButton, multipurposeButton);
+        inlineKeyboard = addDefaultLine(inlineKeyboard);
+
+        return inlineKeyboard;
+    }
+
+    public InlineKeyboardMarkup boxInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
+
+        InlineKeyboardButton circleButton = createInlineKeyboardButtonSetTextAndSetCallBack("Круглая", "/circle_box");
+        InlineKeyboardButton squareButton = createInlineKeyboardButtonSetTextAndSetCallBack("Квадратная", "/square_box");
+
+        addRowsInLine(circleButton, squareButton);
         inlineKeyboard = addDefaultLine(inlineKeyboard);
 
         return inlineKeyboard;

@@ -1,5 +1,6 @@
 package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
+import com.example.graduationProject.config.DBConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +24,18 @@ public class TelegramBot extends TelegramLongPollingBot{
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
 
-    public TelegramBot(BotConfiguration configuration){
+    private DBConfig dbConfig;
+
+    Connection connection = dbConfig.getConnection();
+
+
+    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig) throws SQLException {
         this.botConfiguration = configuration;
+        this.dbConfig = dbConfig;
+        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
     }
+
+
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -65,6 +77,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatID));
         message.setText(textToSend);
+        checkDatabaseConnection();
 
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
@@ -98,7 +111,17 @@ public class TelegramBot extends TelegramLongPollingBot{
 //        return keyboardMarkup;
 //    }
 
-
+    public void checkDatabaseConnection() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                log.info("Database connection is active!");
+            } else {
+                log.warn("Database connection is not active.");
+            }
+        } catch (SQLException e) {
+            log.error("Error checking database connection: " + e.getMessage());
+        }
+    }
 
     @Override
     public String getBotUsername() {
