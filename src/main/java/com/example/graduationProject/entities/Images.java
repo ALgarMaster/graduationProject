@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -15,33 +14,37 @@ public class Images {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_image;
+    @Column(name ="id_image")
+    private int idImage;
 
-    private String file_name;
-    private String file_src;
+    @Column(name ="file_name")
+    private String fileName;
+
+    @Column(name ="file_src")
+    private String fileSrc;
 
     public Images(String file_name, String file_src){
-        this.file_name = file_name;
-        this.file_src = file_src;
+        this.fileName = file_name;
+        this.fileSrc = file_src;
     }
 
-    public int getId_image() {
-        return id_image;
+    public int getIdImage() {
+        return idImage;
     }
 
-    public String getFile_name() {
-        return file_name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setFile_name(String file_name) {
-        this.file_name = file_name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public String getFile_src() {
-        return file_src;
+    public String getFileSrc() {
+        return fileSrc;
     }
 
-    public void setFile_src(String file_src) {
-        this.file_src = file_src;
+    public void setFileSrc(String fileSrc) {
+        this.fileSrc = fileSrc;
     }
 }

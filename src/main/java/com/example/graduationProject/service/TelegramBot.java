@@ -5,6 +5,7 @@ import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.repository.ImageRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -52,10 +53,18 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             switch (messageText){
                 case "/start":
-                    try
+                    Configuration configuration = new Configuration();
+                    configuration.configure();
+                    try(var sessionFactory = configuration.buildSessionFactory();
+                    var session = sessionFactory.openSession();)
                     {
+                        session.beginTransaction();
 
-                        imageRepo.save(new Images("eopgnwoengoiwe", "//eopgnwoengoiwe.png"));
+                        session.save(new Images("engwioew","//engwioengiow"));
+
+                        session.getTransaction().commit();
+
+
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
                     }catch (Exception e){
                         log.error("Error main bot" + e.getMessage());
