@@ -2,6 +2,7 @@ package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
 import com.example.graduationProject.entities.Images;
+import com.example.graduationProject.repository.ImageRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
+    ImageRepo imageRepo;
 
 //    private DBConfig dbConfig;
 //
@@ -50,20 +52,10 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             switch (messageText){
                 case "/start":
-//                    Configuration configuration = new Configuration();
-//                    configuration.configure();
-
-
                     try
-//                            (var sessionFactory = configuration.buildSessionFactory();
-//                        var session = sessionFactory.openSession();
-//                    )
                     {
-//                        session.beginTransaction();
-//
-//                        session.save(new Images("eopgnwoengoiwe", "//eopgnwoengoiwe.png"));
-//
-//                        session.getTransaction().commit();
+
+                        imageRepo.save(new Images("eopgnwoengoiwe", "//eopgnwoengoiwe.png"));
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
                     }catch (Exception e){
                         log.error("Error main bot" + e.getMessage());
