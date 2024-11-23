@@ -5,6 +5,7 @@ import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.repository.ImageRepo;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +28,8 @@ public class ImageController {
 
     private ImageRepo imageRepository;
 
-    @org.springframework.beans.factory.annotation.Value("${root.directory}")
-    private String rootDirectory;
+    @Value("${file.upload-dir}")
+    private String rootDirectory = "C:\\images";
 
 
     public ImageController(ImageRepo imageRepository) {
@@ -37,6 +38,10 @@ public class ImageController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+
+        if (rootDirectory == null) {
+            throw new IllegalStateException("rootDirectory is not set. Please configure the root directory.");
+        }
         // Генерация уникального имени для файла
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
@@ -47,8 +52,6 @@ public class ImageController {
         Files.copy(file.getInputStream(), path);
 
         // Сохраняем путь изображения в базе данных
-
-
         Images image = new Images(fileName,path.toString());
         imageRepository.save(image);
 

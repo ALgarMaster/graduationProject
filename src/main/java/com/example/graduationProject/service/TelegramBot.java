@@ -1,6 +1,7 @@
 package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
+import com.example.graduationProject.controller.ImageController;
 import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.repository.ImageRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,9 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,6 +19,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -58,17 +64,42 @@ public class TelegramBot extends TelegramLongPollingBot{
                     try(var sessionFactory = configuration.buildSessionFactory();
                     var session = sessionFactory.openSession();)
                     {
-                        session.beginTransaction();
-
-                        session.save(new Images("engwioew","//engwioengiow"));
-                        log.info("Add Image name " + "engwioew");
-                        session.getTransaction().commit();
+//                        session.beginTransaction();
+//
+//                        session.save(new Images("engwioew","//engwioengiow"));
+//                        log.info("Add Image name " + "engwioew");
+//                        session.getTransaction().commit();
 
 
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
                     }catch (Exception e){
                         log.error("Error main bot" + e.getMessage());
                     }
+                    break;
+                case "/probeImage":
+
+                    String imagePath = "C:\\Users\\Stanislav\\Downloads\\40951835.jpg";
+
+                    // Create the CustomMultipartFile
+                    CustomMultipartFile file = new CustomMultipartFile(imagePath);
+
+                    // Create the ImageController instance
+                    ImageController imageController = new ImageController(imageRepo); // Make sure imageRepo is properly initialized
+
+                    // Call the uploadImage method
+                    ResponseEntity<String> response = null;
+                    try {
+                        response = imageController.uploadImage(file);
+                        log.info(response.getBody());
+                    } catch (IOException e) {
+                        log.error("Error main bot in /probeImage"+e.getMessage());
+                        throw new RuntimeException(e);
+
+                    }
+
+                    // Output the response (it should be the image URL)
+
+
                     break;
 
                 default: sendMessage(chatID, "Ooooops, sorry, command was not recognized(((");
