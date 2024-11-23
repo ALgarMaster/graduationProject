@@ -61,7 +61,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                         session.beginTransaction();
 
                         session.save(new Images("engwioew","//engwioengiow"));
-
+                        log.info("Add Image name " + "engwioew");
                         session.getTransaction().commit();
 
 

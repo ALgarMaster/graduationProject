@@ -28,6 +28,10 @@ public class Images {
         this.fileSrc = file_src;
     }
 
+    public Images() {
+
+    }
+
     public int getIdImage() {
         return idImage;
     }
