@@ -28,6 +28,7 @@
 
         <!-- Кэширование (опционально) -->
         <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+
         <mapping class="com.example.graduationProject.entities.Images"/>
     </session-factory>
 </hibernate-configuration>

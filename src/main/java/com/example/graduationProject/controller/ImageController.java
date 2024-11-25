@@ -2,39 +2,50 @@ package com.example.graduationProject.controller;
 
 
 import com.example.graduationProject.entities.Images;
-import com.example.graduationProject.repository.ImageRepo;
+import com.example.graduationProject.repository.ImagesRepository;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 @Slf4j
-
+@Controller
 public class ImageController {
-
-    private ImageRepo imageRepository;
 
     @Value("${file.upload-dir}")
     private String rootDirectory = "C:\\images";
 
+    private ImagesRepository imagesRepository;
 
-    public ImageController(ImageRepo imageRepository) {
-        this.imageRepository = imageRepository;
+    @Autowired
+    public ImageController(ImagesRepository imagesRepository){
+        this.imagesRepository = imagesRepository;
     }
+
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
@@ -42,6 +53,16 @@ public class ImageController {
         if (rootDirectory == null) {
             throw new IllegalStateException("rootDirectory is not set. Please configure the root directory.");
         }
+
+        if (imagesRepository == null) {
+            log.error("ImagesRepository is null");
+        } else {
+            log.info("ImagesRepository is properly initialized");
+        }
+
+        Configuration configuration = new Configuration();
+        configuration.configure();
+
         // Генерация уникального имени для файла
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
@@ -53,15 +74,24 @@ public class ImageController {
 
         // Сохраняем путь изображения в базе данных
         Images image = new Images(fileName,path.toString());
-        imageRepository.save(image);
+        imagesRepository.save(image);
 
-        // Генерация URL для доступа к изображению
-        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/images/").path(fileName).toUriString();
+//        try(var sessionFactory = configuration.buildSessionFactory();
+//            var session = sessionFactory.openSession();) {
+//            session.beginTransaction();
+//            session.save(image);
+//            log.info("Add Image name " + "engwioew");
+//            session.getTransaction().commit();
+//        }catch (Exception e){
+//            log.error(" "+ e.getStackTrace());
+//        }
 
 
 
-        return ResponseEntity.ok(imageUrl);
+
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Image uploaded successfully with file name: " + fileName);
     }
 
     // Метод для получения изображения по имени

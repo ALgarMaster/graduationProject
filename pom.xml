@@ -45,20 +45,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Добавьте зависимость для реализации JAXB -->
-		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>4.0.0</version> <!-- Use the latest stable version -->
-		</dependency>
-		<!-- JAXB Runtime Implementation -->
-		<dependency>
-			<groupId>org.glassfish.jaxb</groupId>
-			<artifactId>jaxb-runtime</artifactId>
-			<version>4.0.5</version> <!-- Use the latest stable version -->
-		</dependency>
-
-		<!-- Spring Boot Starter Data JPA (включает Hibernate) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -67,12 +53,29 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.6.0</version> <!-- или последняя доступная версия -->
+			<version>42.7.2</version> <!-- или последняя доступная версия -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-logging</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>4.0.2</version> <!-- Use the latest stable version -->
+		</dependency>
+		<!-- JAXB Runtime Implementation -->
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>4.0.5</version> <!-- Use the latest stable version -->
 		</dependency>
 
 		<dependency>
@@ -82,20 +85,27 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>6.0.0.Final</version>
-		</dependency>
-
-		<dependency>
-			<groupId>c3p0</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
-		</dependency>
-		<dependency>
 			<groupId>jakarta.el</groupId>
 			<artifactId>jakarta.el-api</artifactId>
 			<version>6.0.1</version> <!-- Use the latest version -->
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jaxb-annotations</artifactId>
+			<version>2.18.1</version> <!-- Ensure compatibility with your Jackson version -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots</artifactId>
+			<version>6.9.7.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 
@@ -104,13 +114,6 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>8.0.1.Final</version>
 		</dependency>
-
-		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>3.0.1</version> <!-- or the latest version available -->
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

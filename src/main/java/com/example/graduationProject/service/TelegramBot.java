@@ -3,7 +3,7 @@ import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
 import com.example.graduationProject.controller.ImageController;
 import com.example.graduationProject.entities.Images;
-import com.example.graduationProject.repository.ImageRepo;
+import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -33,9 +33,10 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
-    ImageRepo imageRepo;
 
-//    private DBConfig dbConfig;
+    private ImagesRepository imagesRepository;
+
+    private DBConfig dbConfig;
 //
 //    Connection connection = dbConfig.getConnection();
 
@@ -44,7 +45,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     public TelegramBot(BotConfiguration configuration, DBConfig dbConfig) throws SQLException {
         this.botConfiguration = configuration;
-//        this.dbConfig = dbConfig;
+        this.dbConfig = dbConfig;
 //        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
     }
 
@@ -84,13 +85,13 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     // Create the ImageController instance
-                    ImageController imageController = new ImageController(imageRepo); // Make sure imageRepo is properly initialized
+                    ImageController imageController = new ImageController(imagesRepository); // Make sure imageRepo is properly initialized
 
                     // Call the uploadImage method
                     ResponseEntity<String> response = null;
                     try {
                         response = imageController.uploadImage(file);
-                        log.info(response.getBody());
+                        log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
                         throw new RuntimeException(e);
