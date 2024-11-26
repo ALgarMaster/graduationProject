@@ -2,30 +2,19 @@ package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
 import com.example.graduationProject.controller.ImageController;
-import com.example.graduationProject.entities.Images;
-import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -33,8 +22,6 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
-
-    private ImagesRepository imagesRepository;
 
     private DBConfig dbConfig;
 //
@@ -85,7 +72,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     // Create the ImageController instance
-                    ImageController imageController = new ImageController(imagesRepository); // Make sure imageRepo is properly initialized
+                    ImageController imageController = new ImageController(); // Make sure imageRepo is properly initialized
 
                     // Call the uploadImage method
                     ResponseEntity<String> response = null;
