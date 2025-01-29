@@ -51,7 +51,7 @@ public class ImageController {
         Files.copy(file.getInputStream(), path);
 
         // Сохраняем путь изображения в базе данных
-        Images image = new Images(fileName,path.toString());
+        Images image = new Images(fileName,path.toString(),"0");
 
         try(var sessionFactory = configuration.buildSessionFactory();
             var session = sessionFactory.openSession();) {
