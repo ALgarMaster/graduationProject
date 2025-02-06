@@ -20,8 +20,7 @@ public class Album {
     @Column(name ="name")
     private String name;
 
-    Album(int id_album, String album_name){
-        this.idAlbum = id_album;
+    Album( String album_name){
         this.name = album_name;
     }
 
@@ -37,7 +36,5 @@ public class Album {
         return idAlbum;
     }
 
-    public void setIdAlbum(int idAlbum) {
-        this.idAlbum = idAlbum;
-    }
+
 }

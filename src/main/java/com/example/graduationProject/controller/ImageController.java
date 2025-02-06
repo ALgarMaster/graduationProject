@@ -51,7 +51,7 @@ public class ImageController {
         Files.copy(file.getInputStream(), path);
 
         // Сохраняем путь изображения в базе данных
-        Images image = new Images(fileName,path.toString(),"0");
+        Images image = new Images(fileName,path.toString(),4);
 
         try(var sessionFactory = configuration.buildSessionFactory();
             var session = sessionFactory.openSession();) {
@@ -63,17 +63,14 @@ public class ImageController {
             log.error(" "+ e.getStackTrace());
         }
 
-
-
-
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Image uploaded successfully with file name: " + fileName);
     }
 
     // Метод для получения изображения по имени
     @GetMapping("/{imageName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String imageName) throws IOException {
+    public ResponseEntity<byte[]> getImage( String imageName) throws IOException {
+
         Path path = Paths.get(rootDirectory, imageName);
         File file = path.toFile();
 
