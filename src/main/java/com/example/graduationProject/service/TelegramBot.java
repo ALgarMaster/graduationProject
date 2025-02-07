@@ -1,7 +1,7 @@
 package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
-import com.example.graduationProject.controller.ImageController;
+import com.example.graduationProject.controller.ImagesController;
 import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.example.graduationProject.DAO.ImageDAO;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -31,8 +30,6 @@ public class TelegramBot extends TelegramLongPollingBot{
     final BotConfiguration botConfiguration;
 
     private DBConfig dbConfig;
-//
-//    Connection connection = dbConfig.getConnection();
     private ImagesRepository imagesRepository;
 
 
@@ -80,7 +77,8 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     // Create the ImageController instance
-                    ImageController imageController = new ImageController(imagesRepository); // Make sure imageRepo is properly initialized
+                    ImagesService imagesService = new ImagesService(imagesRepository);
+                    ImagesController imageController = new ImagesController(imagesService); // Make sure imageRepo is properly initialized
 
                     // Call the uploadImage method
                     ResponseEntity<String> response = null;
@@ -99,6 +97,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     break;
                 case "/probeQueryImageById":
                     try {
+
                         ImageDAO imgDAO = new ImageDAO();
                         Images img = imgDAO.getImageById(11);
                         SendPhoto sendPhoto = new SendPhoto();
@@ -129,9 +128,6 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
         }
-
-
-
     }
 
     private String testDatabaseConnection() {
@@ -143,7 +139,6 @@ public class TelegramBot extends TelegramLongPollingBot{
             return "Ошибка подключения к базе данных: " + e.getMessage();
         }
     }
-
 
     private void startCommandReceived(long chatID, String name){
 

@@ -2,12 +2,9 @@ package com.example.graduationProject.controller;
 
 
 import com.example.graduationProject.entities.Images;
-import com.example.graduationProject.repository.ImagesRepository;
-import jakarta.ws.rs.core.HttpHeaders;
+import com.example.graduationProject.service.ImagesService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.cfg.Configuration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,17 +22,14 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 @Slf4j
 @Controller
-public class ImageController {
+public class ImagesController {
 
-    @Value("${file.upload-dir}")
+//    @Value("${file.upload-dir}")
     private String rootDirectory = "C:\\images";  // Директория для загрузки файлов
+    private final ImagesService imagesService;
 
-    @Autowired
-    private ImagesRepository imgRepository;
-
-    // Конструктор для внедрения зависимостей
-    public ImageController(ImagesRepository imgRepository) {
-        this.imgRepository = imgRepository;
+    public ImagesController(ImagesService imagesService) {
+        this.imagesService = imagesService;
     }
 
     // Загрузка изображения
@@ -57,7 +51,7 @@ public class ImageController {
 
         // Сохраняем информацию о файле в базе данных
         Images image = new Images(fileName, path.toString(), albumId);
-        imgRepository.save(image);
+        imagesService.saveImage(image);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Image uploaded successfully with file name: " + fileName);
@@ -78,6 +72,10 @@ public class ImageController {
         } else {
             return ResponseEntity.notFound().build();  // Возвращаем 404, если файл не найден
         }
+    }
+
+    public ImagesService getImagesService() {
+        return imagesService;
     }
 
 //    // Получение всех изображений для конкретного альбома
