@@ -2,6 +2,8 @@ package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
 import com.example.graduationProject.controller.ImageController;
+import com.example.graduationProject.entities.Images;
+import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -10,10 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import com.example.graduationProject.DAO.ImageDAO;
 
+import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 @Slf4j
@@ -26,6 +33,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     private DBConfig dbConfig;
 //
 //    Connection connection = dbConfig.getConnection();
+    private ImagesRepository imagesRepository;
 
 
 
@@ -72,12 +80,12 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     // Create the ImageController instance
-                    ImageController imageController = new ImageController(); // Make sure imageRepo is properly initialized
+                    ImageController imageController = new ImageController(imagesRepository); // Make sure imageRepo is properly initialized
 
                     // Call the uploadImage method
                     ResponseEntity<String> response = null;
                     try {
-                        response = imageController.uploadImage(file);
+                        response = imageController.uploadImage(file, 0);
                         log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
@@ -86,6 +94,32 @@ public class TelegramBot extends TelegramLongPollingBot{
                     }
 
                     // Output the response (it should be the image URL)
+
+
+                    break;
+                case "/probeQueryImageById":
+                    try {
+                        ImageDAO imgDAO = new ImageDAO();
+                        Images img = imgDAO.getImageById(11);
+                        SendPhoto sendPhoto = new SendPhoto();
+                        sendPhoto.setChatId(chatID);
+                        String imagePath_ = "C:\\images\\"+img.getFileName();
+                        InputFile file2 = new InputFile(imagePath_);
+                        sendPhoto.setPhoto(file2);
+//                        response = imageController_.uploadImage(file_);
+//                        log.info("Added writ"+response.getBody());
+                    } catch (Exception e) {
+                        log.error("Error main bot in /probeQuery"+e.getMessage());
+                        throw new RuntimeException(e);
+
+                    }
+                    break;
+                case "/testConnectionToDB":
+
+                    // Output the response (it should be the image URL)
+
+                    String responseMessage = testDatabaseConnection();
+                    sendMessage(chatID, responseMessage);
 
 
                     break;
@@ -98,6 +132,16 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
 
+    }
+
+    private String testDatabaseConnection() {
+        try (Connection connection = dbConfig.getConnection()) {
+            // Если подключение успешно, возвращаем успешное сообщение
+            return "Подключение к базе данных успешно!";
+        } catch (SQLException e) {
+            // Если ошибка подключения, возвращаем сообщение с ошибкой
+            return "Ошибка подключения к базе данных: " + e.getMessage();
+        }
     }
 
 

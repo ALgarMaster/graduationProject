@@ -2,6 +2,7 @@ package com.example.graduationProject.controller;
 
 
 import com.example.graduationProject.entities.Images;
+import com.example.graduationProject.repository.ImagesRepository;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
@@ -27,19 +28,23 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 public class ImageController {
 
     @Value("${file.upload-dir}")
-    private String rootDirectory = "C:\\images";
+    private String rootDirectory = "C:\\images";  // Директория для загрузки файлов
 
+    @Autowired
+    private ImagesRepository imgRepository;
 
+    // Конструктор для внедрения зависимостей
+    public ImageController(ImagesRepository imgRepository) {
+        this.imgRepository = imgRepository;
+    }
 
+    // Загрузка изображения
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("albumId") int albumId) throws IOException {
 
         if (rootDirectory == null) {
             throw new IllegalStateException("rootDirectory is not set. Please configure the root directory.");
         }
-
-        Configuration configuration = new Configuration();
-        configuration.configure();
 
         // Генерация уникального имени для файла
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
@@ -50,26 +55,17 @@ public class ImageController {
         // Сохраняем файл на диске
         Files.copy(file.getInputStream(), path);
 
-        // Сохраняем путь изображения в базе данных
-        Images image = new Images(fileName,path.toString(),4);
-
-        try(var sessionFactory = configuration.buildSessionFactory();
-            var session = sessionFactory.openSession();) {
-            session.beginTransaction();
-            session.save(image);
-            log.info("Add Image name " + "engwioew");
-            session.getTransaction().commit();
-        }catch (Exception e){
-            log.error(" "+ e.getStackTrace());
-        }
+        // Сохраняем информацию о файле в базе данных
+        Images image = new Images(fileName, path.toString(), albumId);
+        imgRepository.save(image);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Image uploaded successfully with file name: " + fileName);
     }
 
-    // Метод для получения изображения по имени
-    @GetMapping("/{imageName}")
-    public ResponseEntity<byte[]> getImage( String imageName) throws IOException {
+    // Получение изображения по имени
+    @GetMapping("/view/{imageName}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String imageName) throws IOException {
 
         Path path = Paths.get(rootDirectory, imageName);
         File file = path.toFile();
@@ -77,12 +73,21 @@ public class ImageController {
         if (file.exists()) {
             byte[] imageBytes = Files.readAllBytes(path);
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"")
-                    .contentType(MediaType.IMAGE_JPEG)  // Если файл JPEG, можно изменить тип на другой (например, PNG)
+                    .contentType(MediaType.IMAGE_JPEG)  // Тип содержимого (можно изменить на PNG или другой формат)
                     .body(imageBytes);
         } else {
-            return ResponseEntity.notFound().build();  // Возвращаем 404, если изображение не найдено
+            return ResponseEntity.notFound().build();  // Возвращаем 404, если файл не найден
         }
     }
+
+//    // Получение всех изображений для конкретного альбома
+//    @GetMapping("/album/{albumId}")
+//    public ResponseEntity<List<Images>> getImagesByAlbumId(@PathVariable int albumId) {
+//        List<Images> images = imgRepository.findById_album(albumId);
+//        if (images.isEmpty()) {
+//            return ResponseEntity.notFound().build();  // Если изображений нет для данного альбома
+//        }
+//        return ResponseEntity.ok(images);  // Возвращаем список изображений для альбома
+//    }
 
 }

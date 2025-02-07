@@ -24,16 +24,19 @@ public class Images {
     private String fileSrc;
 
     @Column(name ="id_album")
-    private int id_album;
+    private int idAlbum;
+
+    public Images() {
+    }
 
     public Images(String file_name, String file_src, int id_album){
         this.fileName = file_name;
         this.fileSrc = file_src;
-        this.id_album = id_album;
+        this.idAlbum = id_album;
     }
 
-    public int getId_album() {
-        return id_album;
+    public int getIdAlbum() {
+        return idAlbum;
     }
 
     public int getIdImage() {
