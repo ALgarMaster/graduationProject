@@ -12,9 +12,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ImagesService {
-    private final ImagesRepository imgRepository;
-
-    @Autowired
+    private ImagesRepository imgRepository;
 
     public List<Images> getAllImages(){
         return imgRepository.findAll();

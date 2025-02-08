@@ -30,10 +30,6 @@ public class TelegramBot extends TelegramLongPollingBot{
     final BotConfiguration botConfiguration;
 
     private DBConfig dbConfig;
-    private ImagesRepository imagesRepository;
-
-
-
 
     public TelegramBot(BotConfiguration configuration, DBConfig dbConfig) throws SQLException {
         this.botConfiguration = configuration;
@@ -77,13 +73,13 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     // Create the ImageController instance
-                    ImagesService imagesService = new ImagesService(imagesRepository);
-                    ImagesController imageController = new ImagesController(imagesService); // Make sure imageRepo is properly initialized
+                    ImagesController imagesController = new ImagesController();
+                     // Make sure imageRepo is properly initialized
 
                     // Call the uploadImage method
                     ResponseEntity<String> response = null;
                     try {
-                        response = imageController.uploadImage(file, 0);
+                        response = imagesController.uploadImage(file, 0);
                         log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());

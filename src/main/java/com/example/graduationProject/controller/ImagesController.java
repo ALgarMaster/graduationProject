@@ -2,6 +2,7 @@ package com.example.graduationProject.controller;
 
 
 import com.example.graduationProject.entities.Images;
+import com.example.graduationProject.repository.ImagesRepository;
 import com.example.graduationProject.service.ImagesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,15 +23,13 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class ImagesController {
 
 //    @Value("${file.upload-dir}")
     private String rootDirectory = "C:\\images";  // Директория для загрузки файлов
-    private final ImagesService imagesService;
+    private ImagesService imagesService;
 
-    public ImagesController(ImagesService imagesService) {
-        this.imagesService = imagesService;
-    }
 
     // Загрузка изображения
     @PostMapping("/upload")
@@ -72,10 +71,6 @@ public class ImagesController {
         } else {
             return ResponseEntity.notFound().build();  // Возвращаем 404, если файл не найден
         }
-    }
-
-    public ImagesService getImagesService() {
-        return imagesService;
     }
 
 //    // Получение всех изображений для конкретного альбома
