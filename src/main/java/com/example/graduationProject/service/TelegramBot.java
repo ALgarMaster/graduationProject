@@ -28,14 +28,15 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
-
+    private ImagesController imagesController;
 
     private DBConfig dbConfig;
 
-    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig) throws SQLException {
+    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController) throws SQLException {
         this.botConfiguration = configuration;
         this.dbConfig = dbConfig;
 //        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
+        this.imagesController = imagesController;
     }
 
 
@@ -75,7 +76,6 @@ public class TelegramBot extends TelegramLongPollingBot{
 
                     // Create the ImageController instance
 
-                    ImagesController imagesController = new ImagesController();
                      // Make sure imageRepo is properly initialized
 
                     // Call the uploadImage method
