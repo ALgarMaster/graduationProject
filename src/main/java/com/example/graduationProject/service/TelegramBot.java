@@ -29,6 +29,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
 
+
     private DBConfig dbConfig;
 
     public TelegramBot(BotConfiguration configuration, DBConfig dbConfig) throws SQLException {
@@ -73,6 +74,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     // Create the ImageController instance
+
                     ImagesController imagesController = new ImagesController();
                      // Make sure imageRepo is properly initialized
 

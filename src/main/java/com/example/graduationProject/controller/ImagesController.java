@@ -28,7 +28,7 @@ public class ImagesController {
 
 //    @Value("${file.upload-dir}")
     private String rootDirectory = "C:\\images";  // Директория для загрузки файлов
-    private ImagesService imagesService;
+    private final ImagesService imagesService;
 
 
     // Загрузка изображения
