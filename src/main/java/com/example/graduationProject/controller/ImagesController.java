@@ -12,12 +12,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
@@ -57,30 +61,47 @@ public class ImagesController {
     }
 
     // Получение изображения по имени
-    @GetMapping("/view/{imageName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String imageName) throws IOException {
+    public File getImage(int id) {
+        // Извлечение изображения по ID
+        Optional<Images> imageOpt = imagesService.getImageById(id);
+        Images image = imageOpt.orElseThrow(() -> new IllegalArgumentException("Image not found"));
 
-        Path path = Paths.get(rootDirectory, imageName);
-        File file = path.toFile();
+        // Получаем путь к файлу
+        Path path = Paths.get(image.getFileSrc());
 
-        if (file.exists()) {
-            byte[] imageBytes = Files.readAllBytes(path);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG)  // Тип содержимого (можно изменить на PNG или другой формат)
-                    .body(imageBytes);
-        } else {
-            return ResponseEntity.notFound().build();  // Возвращаем 404, если файл не найден
+        // Проверяем, существует ли файл
+        if (!Files.exists(path)) {
+            throw new IllegalStateException("File not found");
         }
+
+        // Возвращаем файл
+        return path.toFile();
     }
 
-//    // Получение всех изображений для конкретного альбома
-//    @GetMapping("/album/{albumId}")
-//    public ResponseEntity<List<Images>> getImagesByAlbumId(@PathVariable int albumId) {
-//        List<Images> images = imgRepository.findById_album(albumId);
-//        if (images.isEmpty()) {
-//            return ResponseEntity.notFound().build();  // Если изображений нет для данного альбома
-//        }
-//        return ResponseEntity.ok(images);  // Возвращаем список изображений для альбома
-//    }
+
+    // Получение всех изображений для по альбому в виде списка файлов
+    public List<File> getImagesByAlbumId(int albumId) {
+        ArrayList<Images> imagesList = new ArrayList<>(imagesService.getImagesByIdAlbum(albumId));
+
+        if (imagesList.isEmpty()) {
+            throw new RuntimeException("The array list of images is empty"); // Если изображений нет для данного альбома
+        }
+        // Получаем путь к файлу
+
+
+        List<File> list = new ArrayList<>();
+
+        //нужно теперь заполнить  list из imagesList с помощью метода getImage
+        imagesList.forEach(image -> {
+            Path path = Paths.get(image.getFileSrc());
+            list.add(path.toFile());
+        } );
+
+        if (list.isEmpty()) {
+            throw new RuntimeException("The array list of images is empty"); // Если изображений нет для данного альбома
+        }
+
+        return list;  // Возвращаем список изображений для альбома
+    }
 
 }
