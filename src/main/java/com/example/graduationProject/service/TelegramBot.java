@@ -209,6 +209,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
+    // сделать так чтобы можно было менять подпись картинки
     // Функция для отправки одного изображения
     private void sendSingleImage(File imageFile, int probeAlbumId, long chatID) {
         try {
@@ -226,6 +227,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
+    // сделать так чтобы можно было менять подпись альбома
     // Функция для отправки нескольких изображений
     private void sendMultipleImages(List<File> imagesFileList, int probeAlbumId, long chatID) {
         try {
