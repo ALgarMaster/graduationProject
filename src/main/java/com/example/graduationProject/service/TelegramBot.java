@@ -55,6 +55,8 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
 
+    //поик по айди чата объекта заказа и дальнейшее взаимодействие через чат ади с заказом, запись и поиск.
+
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -66,19 +68,11 @@ public class TelegramBot extends TelegramLongPollingBot{
             switch (messageText){
                 case "/start":
                     try {
-//                        session.beginTransaction();
-//
-//                        session.save(new Images("engwioew","//engwioengiow"));
-//                        log.info("Add Image name " + "engwioew");
-//                        session.getTransaction().commit();
-
-
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
                     }catch (Exception e){
                         log.error("Error main bot" + e.getMessage());
                     }
                     break;
-                //нужно чтобы искало по ключевому слову и формировало сообщение альбом + сообщение+ клавиатура
                 case "/typeOrder":
                     try{
                         STATEMESSAGE statemessage = TYPE;
@@ -90,23 +84,26 @@ public class TelegramBot extends TelegramLongPollingBot{
                     }catch (Exception e){
                         log.error("Error main bot" + e.getMessage());
                     }
-
-
-
-
                     break;
                 case "/probeImage":
+                    // сделать сообщение что выбирите изображение
+                    //подождать пока его загрузять
+                    // валидация изображения
+                    // загрузка изображения  из массива байт и сохранение его в определенном месте на диске, с генерируемым именем
+                    //сообщнеи с выбором альбома
+                    //запрос на список существующих альбомов
+                    //сообщение с результатом
+                    //ожидание сообщения с номером альбома
+                    //валидация ответа
+                    //запись изображения в базу
+                    // валидация записи
+                    //конечный ответ о результате
 
                     String imagePath = "C:\\Users\\Stanislav\\Downloads\\23141.jpg";
 
                     // Create the CustomMultipartFile
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
-                    // Create the ImageController instance
-
-                     // Make sure imageRepo is properly initialized
-
-                    // Call the uploadImage method
                     ResponseEntity<String> response = null;
                     try {
                         response = imagesController.uploadImage(file, 1);
@@ -114,12 +111,109 @@ public class TelegramBot extends TelegramLongPollingBot{
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
                         throw new RuntimeException(e);
-
                     }
 
-                    // Output the response (it should be the image URL)
+                    break;
+                    //запись в объект выбранного типа подарка и вызов этапа с размером
+                case "/basket":
+                    break;
+                case "/pallet":
+                    break;
+                case "/bouqet":
+                    break;
+                case "/box":
+                    break;
+                    //кейсы с размером, которые вызывают следкющую форму пренадлежности, и записывает данные в объект подарка
+                case "/small":
+                    break;
+                case "/medium":
+                    break;
+                case "/large":
+                    break;
+                //кейсы для формы для подтипа букета
+                case "/bouqet1":
+                    break;
+                case "/bouqet2":
+                    break;
+                //выбор пренадлежности к полу
+                case "/he":
+                    break;
+                case "/she":
+                    break;
+                case "/nothing":
+                    break;
+                    //
+                case "/NewYear":
+                    break;
 
+                case "/February23":
+                    break;
 
+                case "/March8":
+                    break;
+
+                case "/Lastbell":
+                    break;
+
+                case "/September1":
+                    break;
+
+                case "/TeachersDay":
+                    break;
+
+                case "/EducatorsDay":
+                    break;
+
+                case "/Birthday":
+                    break;
+
+                case "/CoachsDay":
+                    break;
+
+                case "/MedicalWorkersDay":
+                    break;
+
+                case "/wedding":
+                    break;
+
+                case "/corporate":
+                    break;
+
+                    //команды с цветами
+                case "/red":
+                    break;
+
+                case "/yellow":
+                    break;
+
+                case "/pink":
+                    break;
+
+                case "/green":
+                    break;
+
+                case "/sky":
+                    break;
+
+                case "/brown":
+                    break;
+
+                case "/violet":
+                    break;
+
+                case "/darkGreen":
+                    break;
+
+                case "/purple":
+                    break;
+
+                case "/blue":
+                    break;
+
+                case "/cream":
+                    break;
+
+                case "/":
                     break;
 //                case "/probeQueryImagesByAlbumId0":
 //                    try {
@@ -169,13 +263,8 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
                 case "/testConnectionToDB":
-
-                    // Output the response (it should be the image URL)
-
                     String responseMessage = testDatabaseConnection();
                     sendMessage(chatID, responseMessage);
-
-
                     break;
 
                 default: sendMessage(chatID, "Ooooops, sorry, command was not recognized(((");

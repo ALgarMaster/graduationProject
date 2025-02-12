@@ -1,16 +1,26 @@
 package com.example.graduationProject.entities;
 
-import com.example.graduationProject.enumeration.COLOR_COMBO;
-import com.example.graduationProject.enumeration.FOR_WHOM;
-import com.example.graduationProject.enumeration.SUBJECT;
-import com.example.graduationProject.enumeration.TYPE_ORDER;
+import com.example.graduationProject.enumeration.*;
 
 public class Order {
+    private int id_order;
+    private String title;
     private TYPE_ORDER type;
-    private byte size;
+    private SIZE size;
     private FOR_WHOM fromWhom;
     private SUBJECT subject;
     private COLOR_COMBO color;
+    private int id_user;
+    //определиться с описанием и хранимым объектом
+
+    public Order(){
+
+    }
+
+    public Order(String title, TYPE_ORDER type, SIZE size, FOR_WHOM fromWhom, SUBJECT subject,COLOR_COMBO color, int id_user){
+
+    }
+
 
     public TYPE_ORDER getType() {
         return type;
@@ -20,11 +30,11 @@ public class Order {
         this.type = type;
     }
 
-    public byte getSize() {
+    public SIZE getSize() {
         return size;
     }
 
-    public void setSize(byte size) {
+    public void setSize(SIZE size) {
         this.size = size;
     }
 
