@@ -2,7 +2,10 @@ package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
 import com.example.graduationProject.controller.ImagesController;
+import com.example.graduationProject.controller.StageController;
 import com.example.graduationProject.entities.Images;
+import com.example.graduationProject.entities.Stage;
+import com.example.graduationProject.enumeration.STATEMESSAGE;
 import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
@@ -30,6 +33,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.graduationProject.enumeration.STATEMESSAGE.TYPE;
+
 @Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot{
@@ -37,14 +42,16 @@ public class TelegramBot extends TelegramLongPollingBot{
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
     private ImagesController imagesController;
+    private StageController stageController;
 
     private DBConfig dbConfig;
 
-    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController) throws SQLException {
+    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController, StageController stageController) throws SQLException {
         this.botConfiguration = configuration;
         this.dbConfig = dbConfig;
 //        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
         this.imagesController = imagesController;
+        this.stageController = stageController;
     }
 
 
@@ -58,11 +65,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             switch (messageText){
                 case "/start":
-                    Configuration configuration = new Configuration();
-                    configuration.configure();
-                    try(var sessionFactory = configuration.buildSessionFactory();
-                    var session = sessionFactory.openSession();)
-                    {
+                    try {
 //                        session.beginTransaction();
 //
 //                        session.save(new Images("engwioew","//engwioengiow"));
@@ -75,9 +78,26 @@ public class TelegramBot extends TelegramLongPollingBot{
                         log.error("Error main bot" + e.getMessage());
                     }
                     break;
+                //нужно чтобы искало по ключевому слову и формировало сообщение альбом + сообщение+ клавиатура
+                case "/typeOrder":
+                    try{
+                        STATEMESSAGE statemessage = TYPE;
+                        Stage stage = stageController.getStageByIDAlbumStateMessage(statemessage);
+                        handleAlbumImages(stage.getIdAlbum(),chatID, stage.getTitle(), statemessage);
+
+                        log.info("/typeOrder handled successfully.");
+
+                    }catch (Exception e){
+                        log.error("Error main bot" + e.getMessage());
+                    }
+
+
+
+
+                    break;
                 case "/probeImage":
 
-                    String imagePath = "C:\\Users\\Stanislav\\Downloads\\40951835.jpg";
+                    String imagePath = "C:\\Users\\Stanislav\\Downloads\\23141.jpg";
 
                     // Create the CustomMultipartFile
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
@@ -89,7 +109,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     // Call the uploadImage method
                     ResponseEntity<String> response = null;
                     try {
-                        response = imagesController.uploadImage(file, 0);
+                        response = imagesController.uploadImage(file, 1);
                         log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
@@ -101,51 +121,51 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
                     break;
-                case "/probeQueryImagesByAlbumId0":
-                    try {
-                        int probeAlbumId = 0;
-                        handleAlbumImages(probeAlbumId, chatID);
-                        log.info("/probeQueryImagesByAlbumId handled successfully.");
-                    } catch (Exception e) {
-                        log.error("Error in /probeQueryImagesByAlbumId0: " + e.getMessage(), e);
-                    }
-                    break;
-                case "/probeQueryImagesByAlbumId1":
-                    try {
-                        int probeAlbumId = 1;
-                        handleAlbumImages(probeAlbumId, chatID);
-                        log.info("/probeQueryImagesByAlbumId handled successfully.");
-                    } catch (Exception e) {
-                        log.error("Error in /probeQueryImagesByAlbumId1: " + e.getMessage(), e);
-                    }
-                    break;
-                case "/probeQueryImagesByAlbumId2":
-                    try {
-                        int probeAlbumId = 2;
-                        handleAlbumImages(probeAlbumId, chatID);
-                        log.info("/probeQueryImagesByAlbumId handled successfully.");
-                    } catch (Exception e) {
-                        log.error("Error in /probeQueryImagesByAlbumId2: " + e.getMessage(), e);
-                    }
-                    break;
-                case "/probeQueryImagesByAlbumId3":
-                    try {
-                        int probeAlbumId = 3;
-                        handleAlbumImages(probeAlbumId, chatID);
-                        log.info("/probeQueryImagesByAlbumId handled successfully.");
-                    } catch (Exception e) {
-                        log.error("Error in /probeQueryImagesByAlbumId3: " + e.getMessage(), e);
-                    }
-                    break;
-                case "/probeQueryImagesByAlbumId4":
-                    try {
-                        int probeAlbumId = 4;
-                        handleAlbumImages(probeAlbumId, chatID);
-                        log.info("/probeQueryImagesByAlbumId handled successfully.");
-                    } catch (Exception e) {
-                        log.error("Error in /probeQueryImagesByAlbumId4: " + e.getMessage(), e);
-                    }
-                    break;
+//                case "/probeQueryImagesByAlbumId0":
+//                    try {
+//                        int probeAlbumId = 0;
+//                        handleAlbumImages(probeAlbumId, chatID, "0 альбом");
+//                        log.info("/probeQueryImagesByAlbumId handled successfully.");
+//                    } catch (Exception e) {
+//                        log.error("Error in /probeQueryImagesByAlbumId0: " + e.getMessage(), e);
+//                    }
+//                    break;
+//                case "/probeQueryImagesByAlbumId1":
+//                    try {
+//                        int probeAlbumId = 1;
+//                        handleAlbumImages(probeAlbumId, chatID, "1 альбом");
+//                        log.info("/probeQueryImagesByAlbumId handled successfully.");
+//                    } catch (Exception e) {
+//                        log.error("Error in /probeQueryImagesByAlbumId1: " + e.getMessage(), e);
+//                    }
+//                    break;
+//                case "/probeQueryImagesByAlbumId2":
+//                    try {
+//                        int probeAlbumId = 2;
+//                        handleAlbumImages(probeAlbumId, chatID, "2 альбом");
+//                        log.info("/probeQueryImagesByAlbumId handled successfully.");
+//                    } catch (Exception e) {
+//                        log.error("Error in /probeQueryImagesByAlbumId2: " + e.getMessage(), e);
+//                    }
+//                    break;
+//                case "/probeQueryImagesByAlbumId3":
+//                    try {
+//                        int probeAlbumId = 3;
+//                        handleAlbumImages(probeAlbumId, chatID, "3 альбом");
+//                        log.info("/probeQueryImagesByAlbumId handled successfully.");
+//                    } catch (Exception e) {
+//                        log.error("Error in /probeQueryImagesByAlbumId3: " + e.getMessage(), e);
+//                    }
+//                    break;
+//                case "/probeQueryImagesByAlbumId4":
+//                    try {
+//                        int probeAlbumId = 4;
+//                        handleAlbumImages(probeAlbumId, chatID, "4 альбом");
+//                        log.info("/probeQueryImagesByAlbumId handled successfully.");
+//                    } catch (Exception e) {
+//                        log.error("Error in /probeQueryImagesByAlbumId4: " + e.getMessage(), e);
+//                    }
+//                    break;
 
 
                 case "/testConnectionToDB":
@@ -184,8 +204,8 @@ public class TelegramBot extends TelegramLongPollingBot{
 //        return sendPhoto;
 //    }
 
-
-    public void handleAlbumImages(int probeAlbumId, long chatID) {
+    //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
+    public void handleAlbumImages(int probeAlbumId, long chatID, String title, STATEMESSAGE statemessage) {
         try {
             // Получаем список изображений для альбома
             List<File> imagesFileList = imagesController.getImagesByAlbumId(probeAlbumId);
@@ -195,11 +215,11 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             // Если в альбоме только одно изображение
             if (imagesFileList.size() == 1) {
-                sendSingleImage(imagesFileList.get(0), probeAlbumId, chatID);
+                sendSingleImage(imagesFileList.get(0),  chatID, title, statemessage);
             }
             // Если в альбоме несколько изображений
             else if (!imagesFileList.isEmpty()) {
-                sendMultipleImages(imagesFileList, probeAlbumId, chatID);
+                sendMultipleImages(imagesFileList, probeAlbumId, chatID, title, statemessage);
             }
 
             log.info("Album images handled successfully for albumId: " + probeAlbumId);
@@ -211,15 +231,22 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     // сделать так чтобы можно было менять подпись картинки
     // Функция для отправки одного изображения
-    private void sendSingleImage(File imageFile, int probeAlbumId, long chatID) {
+
+    //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
+    private void sendSingleImage(File imageFile, long chatID, String title, STATEMESSAGE statemessage) {
         try {
+            CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+
+
             SendPhoto sendPhoto = new SendPhoto();
             sendPhoto.setChatId(chatID);
             sendPhoto.setPhoto(new InputFile(imageFile)); // Передаем изображение
-            sendPhoto.setCaption("📸 *Тестовый альбом " + probeAlbumId + " !*");
+            sendPhoto.setCaption(title);
             sendPhoto.setParseMode("Markdown");
 
+
             // Отправляем одно изображение
+            sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard,statemessage));
             execute(sendPhoto);
             log.info("Single image sent successfully.");
         } catch (Exception e) {
@@ -229,8 +256,15 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     // сделать так чтобы можно было менять подпись альбома
     // Функция для отправки нескольких изображений
-    private void sendMultipleImages(List<File> imagesFileList, int probeAlbumId, long chatID) {
+    //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
+    // Функция для отправки нескольких изображений с возможностью изменить подпись альбома
+    private void sendMultipleImages(List<File> imagesFileList, int probeAlbumId, long chatID, String title, STATEMESSAGE statemessage) {
         try {
+            if (imagesFileList.isEmpty()) {
+                log.error("No images to send.");
+                return;
+            }
+
             SendMediaGroup sendMediaGroup = new SendMediaGroup();
             sendMediaGroup.setChatId(chatID);
 
@@ -238,15 +272,13 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             for (int i = 0; i < imagesFileList.size(); i++) {
                 File currentImage = imagesFileList.get(i);
-                log.info("Processing image: " + currentImage.getAbsolutePath());
-
                 if (currentImage.exists()) {
                     InputMediaPhoto photo = new InputMediaPhoto();
-                    photo.setMedia(currentImage, "1");
+                    photo.setMedia(currentImage, "image_" + i);
 
                     // Добавляем подпись только к первому изображению
                     if (i == 0) {
-                        photo.setCaption("📸 *Тестовый альбом " + probeAlbumId + " !*");
+                        photo.setCaption(title);
                         photo.setParseMode("Markdown");
                     }
 
@@ -256,17 +288,39 @@ public class TelegramBot extends TelegramLongPollingBot{
                 }
             }
 
-            if (mediaList.size() >= 2) {
+            if (!mediaList.isEmpty()) {
                 sendMediaGroup.setMedias(mediaList);
                 execute(sendMediaGroup);
-                log.info("Multiple images sent successfully.");
+                log.info("Album sent successfully.");
             } else {
-                log.error("Not enough images to send media group.");
+                log.error("No valid images to send.");
+                return;
             }
+
+            // Отправляем клавиатуру отдельным сообщением
+            sendInlineKeyboard(chatID, statemessage);
+
         } catch (Exception e) {
             log.error("Error sending multiple images: " + e.getMessage(), e);
         }
     }
+
+    // Отдельный метод для отправки клавиатуры
+    private void sendInlineKeyboard(long chatID, STATEMESSAGE statemessage) {
+        try {
+            CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(chatID);
+            sendMessage.setText(" текст с пояснением ");
+            sendMessage.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard, statemessage));
+
+            execute(sendMessage);
+            log.info("Inline keyboard sent successfully.");
+        } catch (Exception e) {
+            log.error("Error sending inline keyboard: " + e.getMessage(), e);
+        }
+    }
+
 
     private void startCommandReceived(long chatID, String name){
 

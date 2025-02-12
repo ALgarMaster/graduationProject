@@ -1,5 +1,6 @@
 package com.example.graduationProject.service;
 
+import com.example.graduationProject.enumeration.STATEMESSAGE;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -16,6 +17,34 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
         rowsInLine = new ArrayList<>();
     }
+
+    public InlineKeyboardMarkup addInlineKeyboardBySTATEMASSEGE(InlineKeyboardMarkup inlineKeyboard, STATEMESSAGE statemessage){
+
+        switch (statemessage){
+            case TYPE:
+                return typeInlineKeyboard(inlineKeyboard);
+            case SIZE:
+                return sizeInlineKeyboard(inlineKeyboard);
+            case FOR_WHOM:
+                return genderInlineKeyboard(inlineKeyboard);
+            case SUBJECT:
+                return subjectInlineKeyboard(inlineKeyboard);
+            case COLOR:
+                return colorPaletteInlineKeyboard(inlineKeyboard);
+        }
+
+//        InlineKeyboardButton backButton = createInlineKeyboardButtonSetTextAndSetCallBack("Назад", "/back");
+//        InlineKeyboardButton contactSellerButton = createInlineKeyboardButtonSetTextAndSetCallBack("Cвязь с продавцом", "/contactseller");
+//        InlineKeyboardButton exitButton = createInlineKeyboardButtonSetTextAndSetCallBack("Отменити заказ", "/exit");
+//
+//        addRowsInLine(backButton,  exitButton);
+//        addRowsInLine(contactSellerButton);
+//        inlineKeyboard.setKeyboard(rowsInLine);
+
+        return inlineKeyboard;
+    }
+
+
 
 
 
@@ -37,8 +66,10 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         InlineKeyboardButton basketButton = createInlineKeyboardButtonSetTextAndSetCallBack("Корзина", "/basket");
         InlineKeyboardButton palletButton = createInlineKeyboardButtonSetTextAndSetCallBack("Поддон", "/pallet");
         InlineKeyboardButton bouquetButton = createInlineKeyboardButtonSetTextAndSetCallBack("Букет", "/bouquet");
+        InlineKeyboardButton boxButton = createInlineKeyboardButtonSetTextAndSetCallBack("Коробка", "/box");
 
-        addRowsInLine(basketButton, palletButton, bouquetButton);
+        addRowsInLine(basketButton, palletButton, boxButton);
+        addRowsInLine(bouquetButton);
         inlineKeyboard = addDefaultLine(inlineKeyboard);
 
         return inlineKeyboard;
@@ -80,8 +111,24 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
     }
 
     public InlineKeyboardMarkup subjectInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
+        InlineKeyboardButton newYear = createInlineKeyboardButtonSetTextAndSetCallBack("Новый год", "/newYear");
+        InlineKeyboardButton feb23 = createInlineKeyboardButtonSetTextAndSetCallBack("23 февраля", "/feb23");
+        InlineKeyboardButton march8 = createInlineKeyboardButtonSetTextAndSetCallBack("8 марта", "/march8");
+        InlineKeyboardButton lastBell = createInlineKeyboardButtonSetTextAndSetCallBack("Последний звонок", "/lastBell");
+        InlineKeyboardButton sept1 = createInlineKeyboardButtonSetTextAndSetCallBack("1 сентября", "/sept1");
+        InlineKeyboardButton teacherDay = createInlineKeyboardButtonSetTextAndSetCallBack("День учителя", "/teacherDay");
+        InlineKeyboardButton educatorDay = createInlineKeyboardButtonSetTextAndSetCallBack("День воспитателя", "/educatorDay");
+        InlineKeyboardButton birthday = createInlineKeyboardButtonSetTextAndSetCallBack("День рождения", "/birthday");
+        InlineKeyboardButton medicDay = createInlineKeyboardButtonSetTextAndSetCallBack("День медработника", "/medicDay");
+        InlineKeyboardButton coachDay = createInlineKeyboardButtonSetTextAndSetCallBack("День тренера", "/coachDay");
 
+        addRowsInLine(newYear, feb23 );
+        addRowsInLine(march8, lastBell);
+        addRowsInLine(sept1, teacherDay);
+        addRowsInLine(educatorDay, birthday);
+        addRowsInLine( medicDay, coachDay);
 
+        inlineKeyboard = addDefaultLine(inlineKeyboard);
 
         return inlineKeyboard;
     }

@@ -30,6 +30,16 @@ public class Stage {
     @Column(name ="id_album")
     private int idAlbum;
 
+    public Stage() {
+    }
+
+    public Stage(String title, String stageContent, STATEMESSAGE stateMessages, int id_album){
+        this.title = title;
+        this.stageContent = stageContent;
+        this.stateMessages = stateMessages;
+        this.idAlbum = id_album;
+    }
+
     public int getIdStage() { return idStage; }
 
     public String getTitle() {
