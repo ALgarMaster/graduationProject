@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.graduationProject.enumeration.STATEMESSAGE.SIZE;
 import static com.example.graduationProject.enumeration.STATEMESSAGE.TYPE;
 
 @Slf4j
@@ -106,13 +107,12 @@ public class TelegramBot extends TelegramLongPollingBot{
 
                     ResponseEntity<String> response = null;
                     try {
-                        response = imagesController.uploadImage(file, 1);
+                        response = imagesController.uploadImage(file, 5);
                         log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
                         throw new RuntimeException(e);
                     }
-
                     break;
                     //запись в объект выбранного типа подарка и вызов этапа с размером
                 case "/basket":
@@ -274,6 +274,24 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
+
+
+    //функция формы выбора размера
+    private void formBySTATEMESSAGE(int chatID, STATEMESSAGE statemessage){
+        try{
+            Stage stage = stageController.getStageByIDAlbumStateMessage(statemessage);
+            handleAlbumImages(stage.getIdAlbum(),chatID, stage.getTitle(), statemessage);
+
+            log.info("sizeForm handled successfully.");
+
+        }catch (Exception e){
+            log.error("Error main bot in sizeForm" + e.getMessage());
+        }
+    }
+
+    //функция формы подтверждения
+
+
     private String testDatabaseConnection() {
         try (Connection connection = dbConfig.getConnection()) {
             // Если подключение успешно, возвращаем успешное сообщение
@@ -308,7 +326,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             }
             // Если в альбоме несколько изображений
             else if (!imagesFileList.isEmpty()) {
-                sendMultipleImages(imagesFileList, probeAlbumId, chatID, title, statemessage);
+                sendMultipleImages(imagesFileList, chatID, title, statemessage);
             }
 
             log.info("Album images handled successfully for albumId: " + probeAlbumId);
@@ -335,6 +353,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
             // Отправляем одно изображение
+            //сделать свитч с стейтмами с клавиатурами
             sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard,statemessage));
             execute(sendPhoto);
             log.info("Single image sent successfully.");
@@ -347,7 +366,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     // Функция для отправки нескольких изображений
     //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
     // Функция для отправки нескольких изображений с возможностью изменить подпись альбома
-    private void sendMultipleImages(List<File> imagesFileList, int probeAlbumId, long chatID, String title, STATEMESSAGE statemessage) {
+    private void sendMultipleImages(List<File> imagesFileList, long chatID, String title, STATEMESSAGE statemessage) {
         try {
             if (imagesFileList.isEmpty()) {
                 log.error("No images to send.");
@@ -387,6 +406,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             }
 
             // Отправляем клавиатуру отдельным сообщением
+            //сделать свитч с стейтмами с клавиатурами
             sendInlineKeyboard(chatID, statemessage);
 
         } catch (Exception e) {
