@@ -60,4 +60,9 @@ public class OrderController {
     public void updateIdUser(int id, int idUser) {
         orderService.updateIdUser(id, idUser);
     }
+
+    public boolean isFieldPresent(int id, String fieldName) {
+        return orderService.isFieldPresent(id, fieldName);
+    }
+
 }

@@ -66,4 +66,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
     @Transactional
     @Query("UPDATE Order o SET o.idUser = :idUser WHERE o.id_order = :id")
     void updateIdUser(@Param("id") int id, @Param("idUser") int idUser);
+
+    @Query("SELECT CASE WHEN :fieldName = 'forWhom' AND o.fromWhom IS NOT NULL THEN true ELSE false END FROM Order o WHERE o.id_order = :id")
+    boolean isFieldPresent(@Param("id") int id, @Param("fieldName") String fieldName);
+
 }

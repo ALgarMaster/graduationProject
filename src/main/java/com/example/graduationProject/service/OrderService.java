@@ -60,4 +60,9 @@ public class OrderService {
     public void updateIdUser(int id, int idUser){
         orderRepository.updateIdUser(id, idUser);
     }
+
+    public boolean isFieldPresent(int id, String fieldName) {
+        return orderRepository.isFieldPresent(id, fieldName);
+    }
+
 }
