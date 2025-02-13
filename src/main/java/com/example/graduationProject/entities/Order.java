@@ -1,24 +1,62 @@
 package com.example.graduationProject.entities;
 
 import com.example.graduationProject.enumeration.*;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
+
+@Data
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "orders")
 public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name ="id_order")
     private int id_order;
+
+    @Column(name ="title")
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name ="type_")
     private TYPE_ORDER type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name ="size_")
     private SIZE size;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name ="for_whom")
     private FOR_WHOM fromWhom;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name ="subject")
     private SUBJECT subject;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name ="color")
     private COLOR_COMBO color;
-    private int id_user;
-    //определиться с описанием и хранимым объектом
 
-    public Order(){
+    @Column(name ="id_user", nullable = false)
+    private int idUser;
 
-    }
 
-    public Order(String title, TYPE_ORDER type, SIZE size, FOR_WHOM fromWhom, SUBJECT subject,COLOR_COMBO color, int id_user){
 
+    public Order(){}
+
+    public Order(String title, TYPE_ORDER type, SIZE size, FOR_WHOM fromWhom, SUBJECT subject, COLOR_COMBO color, int idUser) {
+        this.color = color;
+        this.idUser = idUser;
+        this.title = title;
+        this.size = size;
+        this.fromWhom = fromWhom;
+        this.subject = subject;
+        this.type = type;
     }
 
 
