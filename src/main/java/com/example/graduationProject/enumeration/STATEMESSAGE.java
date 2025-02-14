@@ -5,5 +5,6 @@ public enum STATEMESSAGE {
     FOR_WHOM,
     SUBJECT,
     COLOR,
-    SIZE
+    SIZE,
+    SUBTYPEBOUQET
 }

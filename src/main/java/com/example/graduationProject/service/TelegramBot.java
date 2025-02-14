@@ -2,6 +2,7 @@ package com.example.graduationProject.service;
 import com.example.graduationProject.config.BotConfiguration;
 import com.example.graduationProject.config.DBConfig;
 import com.example.graduationProject.controller.ImagesController;
+import com.example.graduationProject.controller.OrderController;
 import com.example.graduationProject.controller.StageController;
 import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.entities.Stage;
@@ -44,15 +45,17 @@ public class TelegramBot extends TelegramLongPollingBot{
     final BotConfiguration botConfiguration;
     private ImagesController imagesController;
     private StageController stageController;
+    private OrderController orderController;
 
     private DBConfig dbConfig;
 
-    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController, StageController stageController) throws SQLException {
+    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController, StageController stageController, OrderController orderController) throws SQLException {
         this.botConfiguration = configuration;
         this.dbConfig = dbConfig;
 //        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
         this.imagesController = imagesController;
         this.stageController = stageController;
+        this.orderController = orderController;
     }
 
 
@@ -65,6 +68,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         if(update.hasMessage() && update.getMessage().hasText()){
             String messageText = update.getMessage().getText();
             long chatID = update.getMessage().getChatId();
+            log.info("Chat id: "+ chatID);
 
             switch (messageText){
                 case "/start":
@@ -108,6 +112,11 @@ public class TelegramBot extends TelegramLongPollingBot{
                     ResponseEntity<String> response = null;
                     try {
                         response = imagesController.uploadImage(file, 5);
+                        imagesController.uploadImage(file, 6);
+                        imagesController.uploadImage(file, 7);
+                        imagesController.uploadImage(file, 8);
+                        imagesController.uploadImage(file, 9);
+                        imagesController.uploadImage(file, 10);
                         log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
@@ -116,12 +125,22 @@ public class TelegramBot extends TelegramLongPollingBot{
                     break;
                     //запись в объект выбранного типа подарка и вызов этапа с размером
                 case "/basket":
+                    STATEMESSAGE statemessage = SIZE;
+                    handleAlbumImages(6,chatID, stageController.getStageByID(6).getTitle(), SIZE);
+
+                    log.info("/basket handled successfully.");
                     break;
                 case "/pallet":
+                    handleAlbumImages(7,chatID, stageController.getStageByID(7).getTitle(), SIZE);
+                    log.info("/pallet handled successfully.");
                     break;
                 case "/bouqet":
+                    handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
+                    log.info("/pallet handled successfully.");
                     break;
                 case "/box":
+                    handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
+                    log.info("/pallet handled successfully.");
                     break;
                     //кейсы с размером, которые вызывают следкющую форму пренадлежности, и записывает данные в объект подарка
                 case "/small":
