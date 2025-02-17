@@ -60,8 +60,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
     //поик по айди чата объекта заказа и дальнейшее взаимодействие через чат ади с заказом, запись и поиск.
-
-
+    //написать в субботу обработчик колбеков if (update.hasMessage() && update.getMessage().hasText()){...}else if (update.hasCallbackQuery()){...}
     @Override
     public void onUpdateReceived(Update update) {
 
@@ -124,21 +123,21 @@ public class TelegramBot extends TelegramLongPollingBot{
                     }
                     break;
                     //запись в объект выбранного типа подарка и вызов этапа с размером
-                case "/basket":
+                case "basket":
                     STATEMESSAGE statemessage = SIZE;
                     handleAlbumImages(6,chatID, stageController.getStageByID(6).getTitle(), SIZE);
 
                     log.info("/basket handled successfully.");
                     break;
-                case "/pallet":
+                case "pallet":
                     handleAlbumImages(7,chatID, stageController.getStageByID(7).getTitle(), SIZE);
                     log.info("/pallet handled successfully.");
                     break;
-                case "/bouqet":
+                case "bouqet":
                     handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
                     log.info("/pallet handled successfully.");
                     break;
-                case "/box":
+                case "box":
                     handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
                     log.info("/pallet handled successfully.");
                     break;

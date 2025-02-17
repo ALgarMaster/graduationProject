@@ -63,10 +63,10 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
     public InlineKeyboardMarkup typeInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
 
-        InlineKeyboardButton basketButton = createInlineKeyboardButtonSetTextAndSetCallBack("Корзина", "/basket");
-        InlineKeyboardButton palletButton = createInlineKeyboardButtonSetTextAndSetCallBack("Поддон", "/pallet");
-        InlineKeyboardButton bouquetButton = createInlineKeyboardButtonSetTextAndSetCallBack("Букет", "/bouquet");
-        InlineKeyboardButton boxButton = createInlineKeyboardButtonSetTextAndSetCallBack("Коробка", "/box");
+        InlineKeyboardButton basketButton = createInlineKeyboardButtonSetTextAndSetCallBack("Корзина", "basket");
+        InlineKeyboardButton palletButton = createInlineKeyboardButtonSetTextAndSetCallBack("Поддон", "pallet");
+        InlineKeyboardButton bouquetButton = createInlineKeyboardButtonSetTextAndSetCallBack("Букет", "bouquet");
+        InlineKeyboardButton boxButton = createInlineKeyboardButtonSetTextAndSetCallBack("Коробка", "box");
 
         addRowsInLine(basketButton, palletButton, boxButton);
         addRowsInLine(bouquetButton);
