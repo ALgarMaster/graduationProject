@@ -77,9 +77,9 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
     public InlineKeyboardMarkup sizeInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
 
-        InlineKeyboardButton smallButton = createInlineKeyboardButtonSetTextAndSetCallBack("Маленький", "/small");
-        InlineKeyboardButton averageButton = createInlineKeyboardButtonSetTextAndSetCallBack("Средний", "/average");
-        InlineKeyboardButton bigButton = createInlineKeyboardButtonSetTextAndSetCallBack("Большой", "/big");
+        InlineKeyboardButton smallButton = createInlineKeyboardButtonSetTextAndSetCallBack("Маленький", "small");
+        InlineKeyboardButton averageButton = createInlineKeyboardButtonSetTextAndSetCallBack("Средний", "medium");
+        InlineKeyboardButton bigButton = createInlineKeyboardButtonSetTextAndSetCallBack("Большой", "large");
 
         addRowsInLine(smallButton, averageButton, bigButton);
         inlineKeyboard = addDefaultLine(inlineKeyboard);
@@ -89,9 +89,9 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
     public InlineKeyboardMarkup genderInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
 
-        InlineKeyboardButton himButton = createInlineKeyboardButtonSetTextAndSetCallBack("Для него", "/for_him");
-        InlineKeyboardButton herButton = createInlineKeyboardButtonSetTextAndSetCallBack("Для неё", "/for_her");
-        InlineKeyboardButton multipurposeButton = createInlineKeyboardButtonSetTextAndSetCallBack("Универсальный", "/for_multipurpose");
+        InlineKeyboardButton himButton = createInlineKeyboardButtonSetTextAndSetCallBack("Для него", "he");
+        InlineKeyboardButton herButton = createInlineKeyboardButtonSetTextAndSetCallBack("Для неё", "she");
+        InlineKeyboardButton multipurposeButton = createInlineKeyboardButtonSetTextAndSetCallBack("Универсальный", "nothing");
 
         addRowsInLine(himButton, herButton, multipurposeButton);
         inlineKeyboard = addDefaultLine(inlineKeyboard);
@@ -111,22 +111,24 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
     }
 
     public InlineKeyboardMarkup subjectInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
-        InlineKeyboardButton newYear = createInlineKeyboardButtonSetTextAndSetCallBack("Новый год", "/newYear");
-        InlineKeyboardButton feb23 = createInlineKeyboardButtonSetTextAndSetCallBack("23 февраля", "/feb23");
-        InlineKeyboardButton march8 = createInlineKeyboardButtonSetTextAndSetCallBack("8 марта", "/march8");
-        InlineKeyboardButton lastBell = createInlineKeyboardButtonSetTextAndSetCallBack("Последний звонок", "/lastBell");
-        InlineKeyboardButton sept1 = createInlineKeyboardButtonSetTextAndSetCallBack("1 сентября", "/sept1");
-        InlineKeyboardButton teacherDay = createInlineKeyboardButtonSetTextAndSetCallBack("День учителя", "/teacherDay");
-        InlineKeyboardButton educatorDay = createInlineKeyboardButtonSetTextAndSetCallBack("День воспитателя", "/educatorDay");
-        InlineKeyboardButton birthday = createInlineKeyboardButtonSetTextAndSetCallBack("День рождения", "/birthday");
-        InlineKeyboardButton medicDay = createInlineKeyboardButtonSetTextAndSetCallBack("День медработника", "/medicDay");
-        InlineKeyboardButton coachDay = createInlineKeyboardButtonSetTextAndSetCallBack("День тренера", "/coachDay");
+        InlineKeyboardButton newYear = createInlineKeyboardButtonSetTextAndSetCallBack("Новый год", "newYear");
+        InlineKeyboardButton feb23 = createInlineKeyboardButtonSetTextAndSetCallBack("23 февраля", "feb23");
+        InlineKeyboardButton march8 = createInlineKeyboardButtonSetTextAndSetCallBack("8 марта", "march8");
+        InlineKeyboardButton lastBell = createInlineKeyboardButtonSetTextAndSetCallBack("Последний звонок", "lastBell");
+        InlineKeyboardButton sept1 = createInlineKeyboardButtonSetTextAndSetCallBack("1 сентября", "sept1");
+        InlineKeyboardButton teacherDay = createInlineKeyboardButtonSetTextAndSetCallBack("День учителя", "teacherDay");
+        InlineKeyboardButton educatorDay = createInlineKeyboardButtonSetTextAndSetCallBack("День воспитателя", "educatorDay");
+        InlineKeyboardButton birthday = createInlineKeyboardButtonSetTextAndSetCallBack("День рождения", "birthday");
+        InlineKeyboardButton medicDay = createInlineKeyboardButtonSetTextAndSetCallBack("День медработника", "medicDay");
+        InlineKeyboardButton coachDay = createInlineKeyboardButtonSetTextAndSetCallBack("День тренера", "coachDay");
+        InlineKeyboardButton anyDay = createInlineKeyboardButtonSetTextAndSetCallBack("Свой праздник", "anyDay");
 
         addRowsInLine(newYear, feb23 );
         addRowsInLine(march8, lastBell);
         addRowsInLine(sept1, teacherDay);
         addRowsInLine(educatorDay, birthday);
         addRowsInLine( medicDay, coachDay);
+        addRowsInLine(anyDay);
 
         inlineKeyboard = addDefaultLine(inlineKeyboard);
 

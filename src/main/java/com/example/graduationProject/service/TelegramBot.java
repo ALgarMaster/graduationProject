@@ -35,8 +35,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.graduationProject.enumeration.STATEMESSAGE.SIZE;
-import static com.example.graduationProject.enumeration.STATEMESSAGE.TYPE;
+import static com.example.graduationProject.enumeration.STATEMESSAGE.*;
 
 @Slf4j
 @Component
@@ -194,9 +193,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             try {
                 switch (callbackData) {
                     case "basket":
-                        STATEMESSAGE statemessage = SIZE;
                         handleAlbumImages(6,chatID, stageController.getStageByID(6).getTitle(), SIZE);
-
                         log.info("/basket handled successfully.");
                         break;
                     case "pallet":
@@ -211,23 +208,31 @@ public class TelegramBot extends TelegramLongPollingBot{
                         handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
                         log.info("/pallet handled successfully.");
                         break;
-                    case "/small":
+                    case "small":
+                        formBySTATEMESSAGE(chatID,FOR_WHOM);
                         break;
-                    case "/medium":
+                    case "medium":
+                        formBySTATEMESSAGE(chatID,FOR_WHOM);
                         break;
-                    case "/large":
+                    case "large":
+                        formBySTATEMESSAGE(chatID,FOR_WHOM);
                         break;
                     //кейсы для формы для подтипа букета
                     case "/bouqet1":
+                        handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
                         break;
                     case "/bouqet2":
+                        handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
                         break;
                     //выбор пренадлежности к полу
-                    case "/he":
+                    case "he":
+                        formBySTATEMESSAGE(chatID,SUBJECT);
                         break;
-                    case "/she":
+                    case "she":
+                        formBySTATEMESSAGE(chatID,SUBJECT);
                         break;
-                    case "/nothing":
+                    case "nothing":
+                        formBySTATEMESSAGE(chatID,SUBJECT);
                         break;
                     //
                     case "/NewYear":
@@ -309,7 +314,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
     //функция формы выбора размера
-    private void formBySTATEMESSAGE(int chatID, STATEMESSAGE statemessage){
+    private void formBySTATEMESSAGE(long chatID, STATEMESSAGE statemessage){
         try{
             Stage stage = stageController.getStageByIDAlbumStateMessage(statemessage);
             handleAlbumImages(stage.getIdAlbum(),chatID, stage.getTitle(), statemessage);
