@@ -18,6 +18,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
@@ -123,113 +124,9 @@ public class TelegramBot extends TelegramLongPollingBot{
                     }
                     break;
                     //запись в объект выбранного типа подарка и вызов этапа с размером
-                case "basket":
-                    STATEMESSAGE statemessage = SIZE;
-                    handleAlbumImages(6,chatID, stageController.getStageByID(6).getTitle(), SIZE);
 
-                    log.info("/basket handled successfully.");
-                    break;
-                case "pallet":
-                    handleAlbumImages(7,chatID, stageController.getStageByID(7).getTitle(), SIZE);
-                    log.info("/pallet handled successfully.");
-                    break;
-                case "bouqet":
-                    handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
-                    log.info("/pallet handled successfully.");
-                    break;
-                case "box":
-                    handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
-                    log.info("/pallet handled successfully.");
-                    break;
                     //кейсы с размером, которые вызывают следкющую форму пренадлежности, и записывает данные в объект подарка
-                case "/small":
-                    break;
-                case "/medium":
-                    break;
-                case "/large":
-                    break;
-                //кейсы для формы для подтипа букета
-                case "/bouqet1":
-                    break;
-                case "/bouqet2":
-                    break;
-                //выбор пренадлежности к полу
-                case "/he":
-                    break;
-                case "/she":
-                    break;
-                case "/nothing":
-                    break;
-                    //
-                case "/NewYear":
-                    break;
 
-                case "/February23":
-                    break;
-
-                case "/March8":
-                    break;
-
-                case "/Lastbell":
-                    break;
-
-                case "/September1":
-                    break;
-
-                case "/TeachersDay":
-                    break;
-
-                case "/EducatorsDay":
-                    break;
-
-                case "/Birthday":
-                    break;
-
-                case "/CoachsDay":
-                    break;
-
-                case "/MedicalWorkersDay":
-                    break;
-
-                case "/wedding":
-                    break;
-
-                case "/corporate":
-                    break;
-
-                    //команды с цветами
-                case "/red":
-                    break;
-
-                case "/yellow":
-                    break;
-
-                case "/pink":
-                    break;
-
-                case "/green":
-                    break;
-
-                case "/sky":
-                    break;
-
-                case "/brown":
-                    break;
-
-                case "/violet":
-                    break;
-
-                case "/darkGreen":
-                    break;
-
-                case "/purple":
-                    break;
-
-                case "/blue":
-                    break;
-
-                case "/cream":
-                    break;
 
                 case "/":
                     break;
@@ -289,6 +186,123 @@ public class TelegramBot extends TelegramLongPollingBot{
             }
 
 
+        } else if (update.hasCallbackQuery()) {
+            CallbackQuery callbackQuery = update.getCallbackQuery();
+            String callbackData = callbackQuery.getData();
+            long chatID = callbackQuery.getMessage().getChatId();
+
+            try {
+                switch (callbackData) {
+                    case "basket":
+                        STATEMESSAGE statemessage = SIZE;
+                        handleAlbumImages(6,chatID, stageController.getStageByID(6).getTitle(), SIZE);
+
+                        log.info("/basket handled successfully.");
+                        break;
+                    case "pallet":
+                        handleAlbumImages(7,chatID, stageController.getStageByID(7).getTitle(), SIZE);
+                        log.info("/pallet handled successfully.");
+                        break;
+                    case "bouqet":
+                        handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
+                        log.info("/pallet handled successfully.");
+                        break;
+                    case "box":
+                        handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
+                        log.info("/pallet handled successfully.");
+                        break;
+                    case "/small":
+                        break;
+                    case "/medium":
+                        break;
+                    case "/large":
+                        break;
+                    //кейсы для формы для подтипа букета
+                    case "/bouqet1":
+                        break;
+                    case "/bouqet2":
+                        break;
+                    //выбор пренадлежности к полу
+                    case "/he":
+                        break;
+                    case "/she":
+                        break;
+                    case "/nothing":
+                        break;
+                    //
+                    case "/NewYear":
+                        break;
+
+                    case "/February23":
+                        break;
+
+                    case "/March8":
+                        break;
+
+                    case "/Lastbell":
+                        break;
+
+                    case "/September1":
+                        break;
+
+                    case "/TeachersDay":
+                        break;
+
+                    case "/EducatorsDay":
+                        break;
+
+                    case "/Birthday":
+                        break;
+
+                    case "/CoachsDay":
+                        break;
+
+                    case "/MedicalWorkersDay":
+                        break;
+
+                    case "/wedding":
+                        break;
+
+                    case "/corporate":
+                        break;
+
+                    //команды с цветами
+                    case "/red":
+                        break;
+
+                    case "/yellow":
+                        break;
+
+                    case "/pink":
+                        break;
+
+                    case "/green":
+                        break;
+
+                    case "/sky":
+                        break;
+
+                    case "/brown":
+                        break;
+
+                    case "/violet":
+                        break;
+
+                    case "/darkGreen":
+                        break;
+
+                    case "/purple":
+                        break;
+
+                    case "/blue":
+                        break;
+
+                    case "/cream":
+                        break;
+                }
+            } catch (Exception e) {
+                log.error("Error handling callback: " + e.getMessage());
+            }
         }
     }
 
