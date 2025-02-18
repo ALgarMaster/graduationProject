@@ -4,7 +4,9 @@ import com.example.graduationProject.config.DBConfig;
 import com.example.graduationProject.controller.ImagesController;
 import com.example.graduationProject.controller.OrderController;
 import com.example.graduationProject.controller.StageController;
+import com.example.graduationProject.controller.UsersController;
 import com.example.graduationProject.entities.Images;
+import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Stage;
 import com.example.graduationProject.enumeration.STATEMESSAGE;
 import com.example.graduationProject.repository.ImagesRepository;
@@ -46,16 +48,18 @@ public class TelegramBot extends TelegramLongPollingBot{
     private ImagesController imagesController;
     private StageController stageController;
     private OrderController orderController;
+    private UsersController usersController;
 
     private DBConfig dbConfig;
 
-    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController, StageController stageController, OrderController orderController) throws SQLException {
+    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController, StageController stageController, OrderController orderController, UsersController usersController) throws SQLException {
         this.botConfiguration = configuration;
         this.dbConfig = dbConfig;
 //        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
         this.imagesController = imagesController;
         this.stageController = stageController;
         this.orderController = orderController;
+        this.usersController = usersController;
     }
 
 
@@ -68,13 +72,39 @@ public class TelegramBot extends TelegramLongPollingBot{
             String messageText = update.getMessage().getText();
             long chatID = update.getMessage().getChatId();
             log.info("Chat id: "+ chatID);
+            int idOrder;
+            int idUsers;
 
             switch (messageText){
                 case "/start":
                     try {
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
+//                        Order order = new Order();
+//                        order.setTitle(System.currentTimeMillis()+"");
+//                        idOrder = orderController.saveUpdateOrderReturnOrder(order).getId_order();
+//                        log.info("Id create order: " + idOrder);
+                        idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
+                        log.info("Id user : " + idUsers);
+                        Order probeOrder2 = orderController.getOrderById(1);
+                        log.info("order name by id : " + probeOrder2.getTitle());
+                        log.info("order color by id : " + probeOrder2.getColor());
+                        try {
+                            // Получаем последний заказ для пользователя
+                            Order probeOrder = orderController.getLastOrderByUserId(idUsers);
+
+                            // Проверяем, что заказ не является null
+                            if (probeOrder != null) {
+                                log.info("Last order title for user id " + idUsers + ": " + probeOrder.getTitle());
+                            } else {
+                                log.warn("No orders found for user with id: " + idUsers);
+                            }
+                        } catch (Exception e) {
+                            // Логируем ошибку, если что-то пошло не так
+                            log.error("Error occurred while fetching the last order for user id " + idUsers + ": " + e.getMessage(), e);
+                        }
+
                     }catch (Exception e){
-                        log.error("Error main bot" + e.getMessage());
+                        log.error("Error main bot " + e.getMessage());
                     }
                     break;
                 case "/typeOrder":

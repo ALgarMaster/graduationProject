@@ -6,5 +6,8 @@ public enum STATEMESSAGE {
     SUBJECT,
     COLOR,
     SIZE,
-    SUBTYPEBOUQET
+    SUBTYPEBOUQET,
+    NEW,
+    WEB,
+    CHAT
 }

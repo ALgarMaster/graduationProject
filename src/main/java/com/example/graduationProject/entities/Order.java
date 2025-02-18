@@ -19,27 +19,27 @@ public class Order {
     @Column(name ="id_order")
     private int id_order;
 
-    @Column(name ="title")
+    @Column(name ="title", nullable = true)
     private String title;
 
     @Enumerated(EnumType.STRING)
-    @Column(name ="type_")
+    @Column(name ="type_", nullable = true)
     private TYPE_ORDER type;
 
     @Enumerated(EnumType.STRING)
-    @Column(name ="size_")
+    @Column(name ="size_", nullable = true)
     private SIZE size;
 
     @Enumerated(EnumType.STRING)
-    @Column(name ="for_whom")
+    @Column(name ="for_whom", nullable = true)
     private FOR_WHOM fromWhom;
 
     @Enumerated(EnumType.STRING)
-    @Column(name ="subject")
+    @Column(name ="subject", nullable = true)
     private SUBJECT subject;
 
     @Enumerated(EnumType.STRING)
-    @Column(name ="color")
+    @Column(name ="color", nullable = true)
     private COLOR_COMBO color;
 
     @Column(name ="id_user", nullable = false)
@@ -49,6 +49,10 @@ public class Order {
 
     public Order(){}
 
+    public Order(int idUser){
+        this.idUser =idUser;
+    }
+
     public Order(String title, TYPE_ORDER type, SIZE size, FOR_WHOM fromWhom, SUBJECT subject, COLOR_COMBO color, int idUser) {
         this.color = color;
         this.idUser = idUser;
@@ -57,6 +61,14 @@ public class Order {
         this.fromWhom = fromWhom;
         this.subject = subject;
         this.type = type;
+    }
+
+    public void setTitle(String title){
+        this.title = title;
+    }
+
+    public String getTitle(){
+        return title;
     }
 
 
@@ -98,5 +110,19 @@ public class Order {
 
     public void setColor(COLOR_COMBO color) {
         this.color = color;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id_order=" + id_order +
+                ", title='" + title + '\'' +
+                ", type=" + type +
+                ", size=" + size +
+                ", fromWhom=" + fromWhom +
+                ", subject=" + subject +
+                ", color=" + color +
+                ", idUser=" + idUser +
+                '}';
     }
 }

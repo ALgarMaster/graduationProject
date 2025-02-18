@@ -72,4 +72,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
     @Query("SELECT CASE WHEN :fieldName = 'forWhom' AND o.fromWhom IS NOT NULL THEN true ELSE false END FROM Order o WHERE o.id_order = :id")
     boolean isFieldPresent(@Param("id") int id, @Param("fieldName") String fieldName);
 
+
+    //переделать этот запрос
+    List<Order> findAllByIdUser(int idUser);
+
+
 }

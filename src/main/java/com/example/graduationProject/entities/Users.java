@@ -15,13 +15,13 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name ="id_user")
-    private int id_user;
+    private int idUser;
 
     @Column(name ="niсkname_")
     private String niсkname_;
 
     @Column(name ="chat_id")
-    private int chat_id;
+    private int chatId;
 
     @Column(name = "is_admin", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isAdmin = false;
@@ -29,29 +29,29 @@ public class Users {
     public Users(){}
 
     public Users(String nikname_, int chat_id){
-        this.chat_id = chat_id;
+        this.chatId = chat_id;
         this.isAdmin = false;
         this.niсkname_ = nikname_;
     }
 
-    public int getId_user() {
-        return id_user;
+    public int getIdUser() {
+        return idUser;
     }
 
     public String getNiсkname_() {
         return niсkname_;
     }
 
-    public void setNiсkname_(String niсkname_) {
+    public void setNiсkName_(String niсkname_) {
         this.niсkname_ = niсkname_;
     }
 
-    public int getChat_id() {
-        return chat_id;
+    public int getChatId() {
+        return chatId;
     }
 
-    public void setChat_id(int chat_id) {
-        this.chat_id = chat_id;
+    public void setChatId(int chatId) {
+        this.chatId = chatId;
     }
 
     public boolean isAdmin() {
@@ -65,9 +65,9 @@ public class Users {
     @Override
     public String toString() {
         return "Users{" +
-                "id_user=" + id_user +
+                "id_user=" + idUser +
                 ", niсkname_='" + niсkname_ + '\'' +
-                ", chat_id=" + chat_id +
+                ", chat_id=" + chatId +
                 ", isAdmin=" + isAdmin +
                 '}';
     }
