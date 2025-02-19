@@ -4,7 +4,6 @@ import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.enumeration.*;
 import com.example.graduationProject.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -50,7 +49,7 @@ public class OrderController {
         orderService.updateTitle(id, title);
     }
 
-    public void updateType(int id, TYPE_ORDER type) {
+    public void updateType(int id, TYPEORDER type) {
         orderService.updateType(id, type);
     }
 
@@ -58,7 +57,7 @@ public class OrderController {
         orderService.updateSize(id, size);
     }
 
-    public void updateForWhom(int id, FOR_WHOM fromWhom) {
+    public void updateForWhom(int id, FORWHOM fromWhom) {
         orderService.updateForWhom(id, fromWhom);
     }
 
@@ -66,7 +65,7 @@ public class OrderController {
         orderService.updateSubject(id, subject);
     }
 
-    public void updateColor(int id, COLOR_COMBO color) {
+    public void updateColor(int id, COLORCOMBO color) {
         orderService.updateColor(id, color);
     }
 
@@ -83,25 +82,26 @@ public class OrderController {
         log.info("Received request to fetch the last order for user id: {}", userId);
 
         try {
-            // Получаем последний заказ для пользователя
-            ArrayList<Order> orders = new ArrayList<>(orderService.getAllOrderByUserId(userId));
+            // Получаем список заказов пользователя
+            List<Order> orders = orderService.getAllOrdersByUserId(userId);
 
-
-            log.info(orders.get(0)+"");
-            // Проверяем, найден ли заказ
-            if (orders != null) {
-                log.info(orders+"");
-                log.info("Last order found for user id: {}", userId);
-                return orders.get(orders.size()-1); // Возвращаем заказ, если найден
-            } else {
+            // Проверяем, есть ли заказы
+            if (orders.isEmpty()) {
                 log.warn("No orders found for user with id: {}", userId);
-                return null; // Возвращаем null, если заказ не найден
+                return null;
             }
+
+            // Получаем последний заказ из списка
+            Order lastOrder = orders.get(orders.size() - 1);
+            log.info("Last order found for user id {}: {}", userId, lastOrder);
+
+            return lastOrder;
         } catch (Exception e) {
-            // Логируем ошибку, если что-то пошло не так
+            // Логируем ошибку
             log.error("Error occurred while fetching the last order for user id {}: {}", userId, e.getMessage(), e);
-            return null; // Возвращаем null в случае ошибки
+            return null;
         }
     }
+
 
 }

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ public class OrderService {
         orderRepository.updateTitle(id, title);
     }
 
-    public void updateType(int id, TYPE_ORDER type){
+    public void updateType(int id, TYPEORDER type){
         orderRepository.updateType(id, type);
     }
 
@@ -58,7 +58,7 @@ public class OrderService {
         orderRepository.updateSize(id, size);
     }
 
-    public void updateForWhom(int id, FOR_WHOM fromWhom){
+    public void updateForWhom(int id, FORWHOM fromWhom){
         orderRepository.updateForWhom(id, fromWhom);
     }
 
@@ -66,7 +66,7 @@ public class OrderService {
         orderRepository.updateSubject(id, subject);
     }
 
-    public void updateColor(int id, COLOR_COMBO color){
+    public void updateColor(int id, COLORCOMBO color){
         orderRepository.updateColor(id, color);
     }
 
@@ -79,29 +79,9 @@ public class OrderService {
     }
 
     // Метод для получения последнего заказа по idUser
-    public List<Order> getAllOrderByUserId(int idUser) {
-        log.info("Fetching the last order for user with id: {}", idUser);  // Логируем запрос для диагностики
-
-        try {
-            // Получаем заказы пользователя
-            List<Order> orders = orderRepository.findAllByIdUser(idUser);
-
-            // Проверяем, что заказы найдены
-//            if (orders.isEmpty()) {
-//                log.warn("No orders found for user with id: {}", idUser);
-//                return null; // Возвращаем null, если заказ не найден
-//            }
-
-            // Возвращаем последний заказ
-            // Получаем последний элемент в списке
-            log.info("Last order found for user id: {}", idUser);
-            return orders;
-
-        } catch (Exception e) {
-            // Логируем ошибку, если что-то пошло не так
-            log.error("Error occurred while fetching the last order for user id {}: {}", idUser, e.getMessage(), e);
-            return null; // Возвращаем null в случае ошибки
-        }
+    public List<Order> getAllOrdersByUserId(int userId) {
+        return Optional.ofNullable(orderRepository.findAllByUserId(userId))
+                .orElse(Collections.emptyList());
     }
 
 

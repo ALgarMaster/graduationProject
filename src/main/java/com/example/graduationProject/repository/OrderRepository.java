@@ -35,7 +35,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
     @Modifying
     @Transactional
     @Query("UPDATE Order o SET o.type = :type WHERE o.id_order = :id")
-    void updateType(@Param("id") int id, @Param("type") TYPE_ORDER type);
+    void updateType(@Param("id") int id, @Param("type") TYPEORDER type);
 
     // Обновление size
     @Modifying
@@ -47,7 +47,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
     @Modifying
     @Transactional
     @Query("UPDATE Order o SET o.fromWhom = :fromWhom WHERE o.id_order = :id")
-    void updateForWhom(@Param("id") int id, @Param("fromWhom") FOR_WHOM fromWhom);
+    void updateForWhom(@Param("id") int id, @Param("fromWhom") FORWHOM fromWhom);
 
     // Обновление subject
     @Modifying
@@ -59,7 +59,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
     @Modifying
     @Transactional
     @Query("UPDATE Order o SET o.color = :color WHERE o.id_order = :id")
-    void updateColor(@Param("id") int id, @Param("color") COLOR_COMBO color);
+    void updateColor(@Param("id") int id, @Param("color") COLORCOMBO color);
 
     // Обновление idUser
     @Modifying
@@ -74,7 +74,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
 
 
     //переделать этот запрос
-    List<Order> findAllByIdUser(int idUser);
+    @Query("SELECT o FROM Order o WHERE o.idUser = :idUser")
+    List<Order> findAllByUserId(@Param("idUser") int idUser);
 
 
 }

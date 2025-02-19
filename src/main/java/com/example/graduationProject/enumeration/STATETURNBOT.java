@@ -1,5 +1,7 @@
 package com.example.graduationProject.enumeration;
 
-public enum COLOR_COMBO {
-    RED, YELLOW, BLUE
+public enum STATETURNBOT {
+    NEW,
+    WEB,
+    CHAT
 }

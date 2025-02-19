@@ -24,7 +24,7 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(name ="type_", nullable = true)
-    private TYPE_ORDER type;
+    private TYPEORDER type;
 
     @Enumerated(EnumType.STRING)
     @Column(name ="size_", nullable = true)
@@ -32,7 +32,7 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(name ="for_whom", nullable = true)
-    private FOR_WHOM fromWhom;
+    private FORWHOM fromWhom;
 
     @Enumerated(EnumType.STRING)
     @Column(name ="subject", nullable = true)
@@ -40,20 +40,31 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(name ="color", nullable = true)
-    private COLOR_COMBO color;
+    private COLORCOMBO color;
 
-    @Column(name ="id_user", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name ="state_order", nullable = true)
+    private STATETURNBOT stateOrder;
+
+    // Обычное поле для хранения idUser, которое будет внешним ключом
+    @Column(name = "id_user", nullable = false)
     private int idUser;
+
+    // Связь с сущностью User
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user", insertable = false, updatable = false)
+    private Users user;
 
 
 
     public Order(){}
 
-    public Order(int idUser){
+    public Order(int idUser, STATETURNBOT stateOrder){
         this.idUser =idUser;
+        this.stateOrder = stateOrder;
     }
 
-    public Order(String title, TYPE_ORDER type, SIZE size, FOR_WHOM fromWhom, SUBJECT subject, COLOR_COMBO color, int idUser) {
+    public Order(String title, TYPEORDER type, SIZE size, FORWHOM fromWhom, SUBJECT subject, COLORCOMBO color, int idUser,STATETURNBOT stateOrder) {
         this.color = color;
         this.idUser = idUser;
         this.title = title;
@@ -61,6 +72,7 @@ public class Order {
         this.fromWhom = fromWhom;
         this.subject = subject;
         this.type = type;
+        this.stateOrder = stateOrder;
     }
 
     public void setTitle(String title){
@@ -72,11 +84,11 @@ public class Order {
     }
 
 
-    public TYPE_ORDER getType() {
+    public TYPEORDER getType() {
         return type;
     }
 
-    public void setType(TYPE_ORDER type) {
+    public void setType(TYPEORDER type) {
         this.type = type;
     }
 
@@ -88,11 +100,11 @@ public class Order {
         this.size = size;
     }
 
-    public FOR_WHOM getFromWhom() {
+    public FORWHOM getFromWhom() {
         return fromWhom;
     }
 
-    public void setFromWhom(FOR_WHOM fromWhom) {
+    public void setFromWhom(FORWHOM fromWhom) {
         this.fromWhom = fromWhom;
     }
 
@@ -104,11 +116,11 @@ public class Order {
         this.subject = subject;
     }
 
-    public COLOR_COMBO getColor() {
+    public COLORCOMBO getColor() {
         return color;
     }
 
-    public void setColor(COLOR_COMBO color) {
+    public void setColor(COLORCOMBO color) {
         this.color = color;
     }
 
@@ -119,6 +131,7 @@ public class Order {
                 ", title='" + title + '\'' +
                 ", type=" + type +
                 ", size=" + size +
+                ", stateOrder=" + stateOrder +
                 ", fromWhom=" + fromWhom +
                 ", subject=" + subject +
                 ", color=" + color +

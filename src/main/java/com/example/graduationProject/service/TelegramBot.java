@@ -9,6 +9,7 @@ import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Stage;
 import com.example.graduationProject.enumeration.STATEMESSAGE;
+import com.example.graduationProject.enumeration.STATETURNBOT;
 import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
@@ -84,11 +85,21 @@ public class TelegramBot extends TelegramLongPollingBot{
 //                        idOrder = orderController.saveUpdateOrderReturnOrder(order).getId_order();
 //                        log.info("Id create order: " + idOrder);
                         idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
+                        orderController.saveUpdateOrder(new Order(idUsers, STATETURNBOT.NEW));
+
                         log.info("Id user : " + idUsers);
-                        Order probeOrder2 = orderController.getOrderById(1);
-                        log.info("order name by id : " + probeOrder2.getTitle());
-                        log.info("order color by id : " + probeOrder2.getColor());
-                        try {
+//                        Order probeOrder2 = orderController.getOrderById(1);
+//                        log.info("order name by id : " + probeOrder2.getTitle());
+//                        log.info("order color by id : " + probeOrder2.getColor());
+//
+
+                    }catch (Exception e){
+                        log.error("Error main bot " + e.getMessage());
+                    }
+                    break;
+                case "/probeOrderByUserId":
+                    idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
+                    try {
                             // Получаем последний заказ для пользователя
                             Order probeOrder = orderController.getLastOrderByUserId(idUsers);
 
@@ -103,9 +114,6 @@ public class TelegramBot extends TelegramLongPollingBot{
                             log.error("Error occurred while fetching the last order for user id " + idUsers + ": " + e.getMessage(), e);
                         }
 
-                    }catch (Exception e){
-                        log.error("Error main bot " + e.getMessage());
-                    }
                     break;
                 case "/typeOrder":
                     try{
