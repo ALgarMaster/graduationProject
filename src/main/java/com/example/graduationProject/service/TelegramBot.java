@@ -8,8 +8,7 @@ import com.example.graduationProject.controller.UsersController;
 import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Stage;
-import com.example.graduationProject.enumeration.STATEMESSAGE;
-import com.example.graduationProject.enumeration.STATETURNBOT;
+import com.example.graduationProject.enumeration.*;
 import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.cfg.Configuration;
@@ -38,7 +37,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.graduationProject.enumeration.COLORCOMBO.*;
+import static com.example.graduationProject.enumeration.FORWHOM.*;
+import static com.example.graduationProject.enumeration.SIZE.*;
 import static com.example.graduationProject.enumeration.STATEMESSAGE.*;
+import static com.example.graduationProject.enumeration.SUBJECT.*;
 
 @Slf4j
 @Component
@@ -84,10 +87,9 @@ public class TelegramBot extends TelegramLongPollingBot{
 //                        order.setTitle(System.currentTimeMillis()+"");
 //                        idOrder = orderController.saveUpdateOrderReturnOrder(order).getId_order();
 //                        log.info("Id create order: " + idOrder);
-                        idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
-                        orderController.saveUpdateOrder(new Order(idUsers, STATETURNBOT.NEW));
 
-                        log.info("Id user : " + idUsers);
+
+
 //                        Order probeOrder2 = orderController.getOrderById(1);
 //                        log.info("order name by id : " + probeOrder2.getTitle());
 //                        log.info("order color by id : " + probeOrder2.getColor());
@@ -96,6 +98,11 @@ public class TelegramBot extends TelegramLongPollingBot{
                     }catch (Exception e){
                         log.error("Error main bot " + e.getMessage());
                     }
+                    break;
+                case "/createOrder":
+                    idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
+                    orderController.saveUpdateOrder(new Order(idUsers));
+                    log.info("Id user : " + idUsers);
                     break;
                 case "/probeOrderByUserId":
                     idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
@@ -148,12 +155,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
                     ResponseEntity<String> response = null;
                     try {
-                        response = imagesController.uploadImage(file, 5);
-                        imagesController.uploadImage(file, 6);
-                        imagesController.uploadImage(file, 7);
-                        imagesController.uploadImage(file, 8);
-                        imagesController.uploadImage(file, 9);
-                        imagesController.uploadImage(file, 10);
+                        response = imagesController.uploadImage(file, 11);
                         log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
@@ -224,6 +226,8 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
         } else if (update.hasCallbackQuery()) {
+            String nickName = update.getCallbackQuery().getFrom().getUserName();
+            int idUsers;
             CallbackQuery callbackQuery = update.getCallbackQuery();
             String callbackData = callbackQuery.getData();
             long chatID = callbackQuery.getMessage().getChatId();
@@ -231,116 +235,168 @@ public class TelegramBot extends TelegramLongPollingBot{
             try {
                 switch (callbackData) {
                     case "basket":
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.BASKET);
                         handleAlbumImages(6,chatID, stageController.getStageByID(6).getTitle(), SIZE);
                         log.info("/basket handled successfully.");
                         break;
                     case "pallet":
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.PALLET);
                         handleAlbumImages(7,chatID, stageController.getStageByID(7).getTitle(), SIZE);
                         log.info("/pallet handled successfully.");
                         break;
-                    case "bouqet":
-                        handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
+                    case "bouquet":
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.BOUQUET);
+                        handleAlbumImages(10,chatID, stageController.getStageByID(10).getTitle(), SUBTYPEBOUQET);
                         log.info("/pallet handled successfully.");
                         break;
                     case "box":
-                        handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.BOX);
+                        handleAlbumImages(11,chatID, stageController.getStageByID(11).getTitle(), SUBTYPEBOX);
                         log.info("/pallet handled successfully.");
                         break;
+                    case "round_bouquet":
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.ROUNDBOUQUET);
+                        handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
+                        break;
+                    case "little_bag_bouquet":
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.BOUQUETLEG);
+                        handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
+                        break;
+                    case "circle_box":
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.ROUNDBOX);
+                        handleAlbumImages(10,chatID, stageController.getStageByID(9).getTitle(), SIZE);
+                        break;
+                    case "square_box":
+                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.SQUAREBOX);
+                        handleAlbumImages(10,chatID, stageController.getStageByID(9).getTitle(), SIZE);
+                        break;
                     case "small":
+                        setSizeOrderByCallBack(chatID,nickName,SMALL);
                         formBySTATEMESSAGE(chatID,FOR_WHOM);
                         break;
                     case "medium":
+                        setSizeOrderByCallBack(chatID,nickName,MEDIUM);
                         formBySTATEMESSAGE(chatID,FOR_WHOM);
                         break;
                     case "large":
+                        setSizeOrderByCallBack(chatID,nickName,LARGE);
                         formBySTATEMESSAGE(chatID,FOR_WHOM);
                         break;
                     //кейсы для формы для подтипа букета
-                    case "/bouqet1":
-                        handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
-                        break;
-                    case "/bouqet2":
-                        handleAlbumImages(9,chatID, stageController.getStageByID(9).getTitle(), SIZE);
-                        break;
+
                     //выбор пренадлежности к полу
                     case "he":
+                        setGenderOrderByCallBack(chatID,nickName,HE);
                         formBySTATEMESSAGE(chatID,SUBJECT);
                         break;
                     case "she":
+                        setGenderOrderByCallBack(chatID,nickName,SHE);
                         formBySTATEMESSAGE(chatID,SUBJECT);
                         break;
                     case "nothing":
+                        setGenderOrderByCallBack(chatID,nickName,NOTHING);
                         formBySTATEMESSAGE(chatID,SUBJECT);
                         break;
                     //
-                    case "/NewYear":
+                    case "newYear":
+                        setSubjectOrderByCallBack(chatID,nickName,NEW_YEAR);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/February23":
+                    case "feb23":
+                        setSubjectOrderByCallBack(chatID,nickName,FEBRUARY_23);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/March8":
+                    case "march8":
+                        setSubjectOrderByCallBack(chatID,nickName,MARCH_8);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/Lastbell":
+                    case "lastBell":
+                        setSubjectOrderByCallBack(chatID,nickName,LAST_BELL);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/September1":
+                    case "sept1":
+                        setSubjectOrderByCallBack(chatID,nickName,SEPTEMBER_1);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/TeachersDay":
+                    case "teacherDay":
+                        setSubjectOrderByCallBack(chatID,nickName,TEACHERS_DAY);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/EducatorsDay":
+                    case "educatorDay":
+                        setSubjectOrderByCallBack(chatID,nickName,EDUCATORS_DAY);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/Birthday":
+                    case "birthday":
+                        setSubjectOrderByCallBack(chatID,nickName,BIRTHDAY);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/CoachsDay":
+                    case "medicDay":
+                        setSubjectOrderByCallBack(chatID,nickName,MEDICAL_WORKERS_DAY);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/MedicalWorkersDay":
+                    case "coachDay":
+                        setSubjectOrderByCallBack(chatID,nickName,COACHS_DAY);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/wedding":
+                    case "anyDay":
+                        setSubjectOrderByCallBack(chatID,nickName,ANY_DAY);
+                        formBySTATEMESSAGE(chatID, COLOR);
                         break;
 
-                    case "/corporate":
-                        break;
 
                     //команды с цветами
-                    case "/red":
+                    case "red":
+                        setColorOrderByCallBack(chatID,nickName,RED);
                         break;
 
-                    case "/yellow":
+                    case "yellow":
+                        setColorOrderByCallBack(chatID,nickName,YELLOW);
                         break;
 
-                    case "/pink":
+                    case "pink":
+                        setColorOrderByCallBack(chatID,nickName,PINK);
                         break;
 
-                    case "/green":
+                    case "green":
+                        setColorOrderByCallBack(chatID,nickName,GREEN);
                         break;
 
-                    case "/sky":
+                    case "sky":
+                        setColorOrderByCallBack(chatID,nickName,SKY);
                         break;
 
-                    case "/brown":
+                    case "brown":
+                        setColorOrderByCallBack(chatID,nickName,BROWN);
                         break;
 
-                    case "/violet":
+                    case "violet":
+                        setColorOrderByCallBack(chatID,nickName,VIOLET);
                         break;
 
-                    case "/darkGreen":
+                    case "darkGreen":
+                        setColorOrderByCallBack(chatID,nickName,DARK_GREEN);
                         break;
 
-                    case "/purple":
+                    case "purple":
+                        setColorOrderByCallBack(chatID,nickName,PURPLE);
                         break;
 
-                    case "/blue":
+                    case "blue":
+                        setColorOrderByCallBack(chatID,nickName,BLUE);
                         break;
 
-                    case "/cream":
+                    case "cream":
+                        setColorOrderByCallBack(chatID,nickName,CREAM);
                         break;
                 }
             } catch (Exception e) {
@@ -364,7 +420,176 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    //функция формы подтверждения
+    private void setSubjectOrderByCallBack(long chatId, String nickName, SUBJECT subject){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        switch (subject){
+            case WEDDING:
+                order.setSubject(WEDDING);
+                break;
+            case MARCH_8:
+                order.setSubject(MARCH_8);
+                break;
+            case BIRTHDAY:
+                order.setSubject(BIRTHDAY);
+                break;
+            case NEW_YEAR:
+                order.setSubject(NEW_YEAR);
+                break;
+            case CORPORATE:
+                order.setSubject(CORPORATE);
+                break;
+            case LAST_BELL:
+                order.setSubject(LAST_BELL);
+                break;
+            case COACHS_DAY:
+                order.setSubject(COACHS_DAY);
+                break;
+            case FEBRUARY_23:
+                order.setSubject(FEBRUARY_23);
+                break;
+            case SEPTEMBER_1:
+                order.setSubject(SEPTEMBER_1);
+                break;
+            case TEACHERS_DAY:
+                order.setSubject(TEACHERS_DAY);
+                break;
+            case EDUCATORS_DAY:
+                order.setSubject(EDUCATORS_DAY);
+                break;
+            case MEDICAL_WORKERS_DAY:
+                order.setSubject(MEDICAL_WORKERS_DAY);
+                break;
+        }
+        orderController.saveUpdateOrder(order);
+        order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        orderController.saveUpdateOrder(order);
+    }
+
+    private void setColorOrderByCallBack(long chatId, String nickName, COLORCOMBO color){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        switch (color){
+            case RED:
+                order.setColor(RED);
+                break;
+            case SKY:
+                order.setColor(SKY);
+                break;
+            case BLUE:
+                order.setColor(BLUE);
+                break;
+            case PINK:
+                order.setColor(PINK);
+                break;
+            case BROWN:
+                order.setColor(BROWN);
+                break;
+            case CREAM:
+                order.setColor(CREAM);
+                break;
+            case GREEN:
+                order.setColor(GREEN);
+                break;
+            case PURPLE:
+                order.setColor(PURPLE);
+                break;
+            case VIOLET:
+                order.setColor(VIOLET);
+                break;
+            case YELLOW:
+                order.setColor(YELLOW);
+                break;
+            case DARK_GREEN:
+                order.setColor(DARK_GREEN);
+                break;
+        }
+        orderController.saveUpdateOrder(order);
+        order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        orderController.saveUpdateOrder(order);
+    }
+
+    private void setSizeOrderByCallBack(long chatId, String nickName, SIZE size){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        switch (size){
+            case SMALL:
+                order.setSize(SMALL);
+                break;
+            case MEDIUM:
+                order.setSize(MEDIUM);
+                break;
+            case LARGE:
+                order.setSize(LARGE);
+                break;
+        }
+        orderController.saveUpdateOrder(order);
+        order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        orderController.saveUpdateOrder(order);
+    }
+
+    private void setGenderOrderByCallBack(long chatId, String nickName, FORWHOM forwhom){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        switch (forwhom){
+            case HE:
+                order.setFromWhom(HE);
+                break;
+            case SHE:
+                order.setFromWhom(SHE);
+                break;
+            case NOTHING:
+                order.setFromWhom(NOTHING);
+                break;
+        }
+        orderController.saveUpdateOrder(order);
+        order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        orderController.saveUpdateOrder(order);
+    }
+
+    private void setTypeOrderByCallBack(long chatId, String nickName, TYPEORDER type){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        switch (type){
+            case BASKET:
+                order.setType(TYPEORDER.BASKET);
+                break;
+            case BOX:
+                order.setType(TYPEORDER.BOX);
+                break;
+            case PALLET:
+                order.setType(TYPEORDER.PALLET);
+                break;
+            case BOUQUET:
+                order.setType(TYPEORDER.BOUQUET);
+                break;
+            case ROUNDBOX:
+                order.setType(TYPEORDER.ROUNDBOX);
+                break;
+            case SQUAREBOX:
+                order.setType(TYPEORDER.SQUAREBOX);
+                break;
+            case BOUQUETLEG:
+                order.setType(TYPEORDER.BOUQUETLEG);
+                break;
+            case ROUNDBOUQUET:
+                order.setType(TYPEORDER.ROUNDBOUQUET);
+                break;
+        }
+        orderController.saveUpdateOrder(order);
+        order = orderController.getLastOrderByUserId(idUsers);
+        log.info(order.toString());
+        orderController.saveUpdateOrder(order);
+    }
 
 
     private String testDatabaseConnection() {

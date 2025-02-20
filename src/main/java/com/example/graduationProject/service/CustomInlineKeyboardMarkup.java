@@ -31,6 +31,10 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
                 return subjectInlineKeyboard(inlineKeyboard);
             case COLOR:
                 return colorPaletteInlineKeyboard(inlineKeyboard);
+            case SUBTYPEBOX:
+                return boxInlineKeyboard(inlineKeyboard);
+            case SUBTYPEBOUQET:
+                return subTypeBouquetInlineKeyboard(inlineKeyboard);
         }
 
 //        InlineKeyboardButton backButton = createInlineKeyboardButtonSetTextAndSetCallBack("Назад", "/back");
@@ -101,10 +105,22 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
     public InlineKeyboardMarkup boxInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
 
-        InlineKeyboardButton circleButton = createInlineKeyboardButtonSetTextAndSetCallBack("Круглая", "/circle_box");
-        InlineKeyboardButton squareButton = createInlineKeyboardButtonSetTextAndSetCallBack("Квадратная", "/square_box");
+        InlineKeyboardButton circleButton = createInlineKeyboardButtonSetTextAndSetCallBack("Круглая", "circle_box");
+        InlineKeyboardButton squareButton = createInlineKeyboardButtonSetTextAndSetCallBack("Квадратная", "square_box");
 
         addRowsInLine(circleButton, squareButton);
+        inlineKeyboard = addDefaultLine(inlineKeyboard);
+
+        return inlineKeyboard;
+    }
+
+    public InlineKeyboardMarkup subTypeBouquetInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
+
+        InlineKeyboardButton roundButton = createInlineKeyboardButtonSetTextAndSetCallBack("Круглый букет", "round_bouquet");
+        InlineKeyboardButton littleBagButton = createInlineKeyboardButtonSetTextAndSetCallBack("Букет кулечком", "little_bag_bouquet");
+
+
+        addRowsInLine(roundButton, littleBagButton);
         inlineKeyboard = addDefaultLine(inlineKeyboard);
 
         return inlineKeyboard;
@@ -121,6 +137,8 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         InlineKeyboardButton birthday = createInlineKeyboardButtonSetTextAndSetCallBack("День рождения", "birthday");
         InlineKeyboardButton medicDay = createInlineKeyboardButtonSetTextAndSetCallBack("День медработника", "medicDay");
         InlineKeyboardButton coachDay = createInlineKeyboardButtonSetTextAndSetCallBack("День тренера", "coachDay");
+        InlineKeyboardButton weddingDay = createInlineKeyboardButtonSetTextAndSetCallBack("Свадьба", "wedding");
+        InlineKeyboardButton corporateDay = createInlineKeyboardButtonSetTextAndSetCallBack("Корпоративный", "corporate");
         InlineKeyboardButton anyDay = createInlineKeyboardButtonSetTextAndSetCallBack("Свой праздник", "anyDay");
 
         addRowsInLine(newYear, feb23 );
@@ -128,6 +146,7 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         addRowsInLine(sept1, teacherDay);
         addRowsInLine(educatorDay, birthday);
         addRowsInLine( medicDay, coachDay);
+        addRowsInLine(weddingDay, corporateDay);
         addRowsInLine(anyDay);
 
         inlineKeyboard = addDefaultLine(inlineKeyboard);
@@ -136,17 +155,17 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
     }
 
     public InlineKeyboardMarkup colorPaletteInlineKeyboard(InlineKeyboardMarkup inlineKeyboard){
-        InlineKeyboardButton red = createInlineKeyboardButtonSetTextAndSetCallBack("Красный", "/red");
-        InlineKeyboardButton yellow = createInlineKeyboardButtonSetTextAndSetCallBack("Желтый", "/yellow");
-        InlineKeyboardButton pink = createInlineKeyboardButtonSetTextAndSetCallBack("Розовый", "/pink");
-        InlineKeyboardButton green = createInlineKeyboardButtonSetTextAndSetCallBack("Зеленый", "/green");
-        InlineKeyboardButton sky = createInlineKeyboardButtonSetTextAndSetCallBack("Голубой", "/sky");
-        InlineKeyboardButton blue = createInlineKeyboardButtonSetTextAndSetCallBack("Синий", "/blue");
-        InlineKeyboardButton brown = createInlineKeyboardButtonSetTextAndSetCallBack("Коричневый", "/brown");
-        InlineKeyboardButton violet = createInlineKeyboardButtonSetTextAndSetCallBack("Фиолетовый", "/violet");
-        InlineKeyboardButton darkGreen = createInlineKeyboardButtonSetTextAndSetCallBack("Темно зеленый", "/darkGreen");
-        InlineKeyboardButton purple = createInlineKeyboardButtonSetTextAndSetCallBack("Лиловый", "/purple");
-        InlineKeyboardButton cream = createInlineKeyboardButtonSetTextAndSetCallBack("Кремовый", "/cream");
+        InlineKeyboardButton red = createInlineKeyboardButtonSetTextAndSetCallBack("Красный", "red");
+        InlineKeyboardButton yellow = createInlineKeyboardButtonSetTextAndSetCallBack("Желтый", "yellow");
+        InlineKeyboardButton pink = createInlineKeyboardButtonSetTextAndSetCallBack("Розовый", "pink");
+        InlineKeyboardButton green = createInlineKeyboardButtonSetTextAndSetCallBack("Зеленый", "green");
+        InlineKeyboardButton sky = createInlineKeyboardButtonSetTextAndSetCallBack("Голубой", "sky");
+        InlineKeyboardButton blue = createInlineKeyboardButtonSetTextAndSetCallBack("Синий", "blue");
+        InlineKeyboardButton brown = createInlineKeyboardButtonSetTextAndSetCallBack("Коричневый", "brown");
+        InlineKeyboardButton violet = createInlineKeyboardButtonSetTextAndSetCallBack("Фиолетовый", "violet");
+        InlineKeyboardButton darkGreen = createInlineKeyboardButtonSetTextAndSetCallBack("Темно зеленый", "darkGreen");
+        InlineKeyboardButton purple = createInlineKeyboardButtonSetTextAndSetCallBack("Лиловый", "purple");
+        InlineKeyboardButton cream = createInlineKeyboardButtonSetTextAndSetCallBack("Кремовый", "cream");
 
         addRowsInLine(red, yellow, pink);
         addRowsInLine(green,sky, blue);

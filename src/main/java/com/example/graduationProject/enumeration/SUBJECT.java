@@ -12,7 +12,8 @@ public enum SUBJECT {
     COACHS_DAY("CoachsDay"),
     MEDICAL_WORKERS_DAY("MedicalWorkersDay"),
     WEDDING("wedding"),
-    CORPORATE("corporate");
+    CORPORATE("corporate"),
+    ANY_DAY("aneday");
 
     private final String command;
 

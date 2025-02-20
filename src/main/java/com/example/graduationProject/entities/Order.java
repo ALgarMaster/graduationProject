@@ -59,9 +59,9 @@ public class Order {
 
     public Order(){}
 
-    public Order(int idUser, STATETURNBOT stateOrder){
+    public Order(int idUser){
         this.idUser =idUser;
-        this.stateOrder = stateOrder;
+        this.stateOrder = STATETURNBOT.NEW;
     }
 
     public Order(String title, TYPEORDER type, SIZE size, FORWHOM fromWhom, SUBJECT subject, COLORCOMBO color, int idUser,STATETURNBOT stateOrder) {

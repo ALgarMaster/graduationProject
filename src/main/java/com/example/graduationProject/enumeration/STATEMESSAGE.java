@@ -7,5 +7,6 @@ public enum STATEMESSAGE {
     COLOR,
     SIZE,
     SUBTYPEBOUQET,
+    SUBTYPEBOX
 
 }
