@@ -409,7 +409,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    private void backForm(long chatId, String nickName){
+    private void backForm(long chatId, String nickName) {
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
 
@@ -419,81 +419,137 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
 
         STATETURNBOT currentState = order.getStateOrder();
-        log.info("Current state: " + currentState);
+        log.info("Current state for user {}: {}", nickName, currentState);
 
         switch (currentState) {
             case COLOR:
-                order.setColor(null);
+                // Независимо от того, выбран цвет или нет, переходим на SUBJECT
+                if (order.getColor() != null) {
+                    log.debug("Resetting color for order: {}", order.getId_order());
+                    order.setColor(null);
+                }
                 order.setStateOrder(STATETURNBOT.SUBJECT);
+                formBySTATEMESSAGE(chatId, COLOR);
+                break;
+
+            case SUBJECT:
+                if (order.getSubject() != null) {
+                    log.debug("Resetting subject for order: {}", order.getId_order());
+                    order.setSubject(null);
+                }
+                order.setStateOrder(STATETURNBOT.FOR_WHOM);
                 formBySTATEMESSAGE(chatId, SUBJECT);
                 break;
-            case SUBJECT:
-                order.setSubject(null);
-                order.setStateOrder(STATETURNBOT.FOR_WHOM);
+
+            case FOR_WHOM:
+                if (order.getFromWhom() != null) {
+                    log.debug("Resetting fromWhom for order: {}", order.getId_order());
+                    order.setFromWhom(null);
+                }
+                order.setStateOrder(STATETURNBOT.SIZE);
                 formBySTATEMESSAGE(chatId, FOR_WHOM);
                 break;
-            case FOR_WHOM:
-                order.setFromWhom(null);
-                order.setStateOrder(STATETURNBOT.SIZE);
-                formBySTATEMESSAGE(chatId, SIZE);
 
-                break;
             case SIZE:
-                if (order.getType() == ROUNDBOUQUET ||order.getType() == BOUQUETLEG) {
-                    order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
-                    formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
-                } else if (order.getType() == SQUAREBOX ||order.getType() == ROUNDBOX) {
-                    order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
-                    formBySTATEMESSAGE(chatId, SUBTYPEBOX);
-                } else {
+                if (order.getSize() != null) {
+                    log.debug("Resetting size for order: {}", order.getId_order());
                     order.setSize(null);
-                    order.setStateOrder(STATETURNBOT.TYPE);
-                    formBySTATEMESSAGE(chatId, TYPE);
+                }
+
+                // Вызываем нужный альбом в зависимости от типа заказа
+                switch (order.getType()) {
+                    case BASKET:
+                        // Например, для "basket" используем альбом с id 6 и форму SIZE
+                        order.setStateOrder(STATETURNBOT.TYPE); // или другой нужный статус
+                        handleAlbumImages(6, chatId, stageController.getStageByID(6).getTitle(), SIZE);
+                        log.info("Transitioning to album for BASKET for order: {}", order.getId_order());
+                        break;
+
+                    case PALLET:
+                        order.setStateOrder(STATETURNBOT.TYPE);
+                        handleAlbumImages(7, chatId, stageController.getStageByID(7).getTitle(), SIZE);
+                        log.info("Transitioning to album for PALLET for order: {}", order.getId_order());
+                        break;
+
+                    case BOUQUET:
+                        order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
+                        handleAlbumImages(10, chatId, stageController.getStageByID(10).getTitle(), SUBTYPEBOUQET);
+                        log.info("Transitioning to album for BOUQUET for order: {}", order.getId_order());
+                        break;
+
+                    case BOX:
+                        order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
+                        handleAlbumImages(11, chatId, stageController.getStageByID(11).getTitle(), SUBTYPEBOX);
+                        log.info("Transitioning to album for BOX for order: {}", order.getId_order());
+                        break;
+
+                    case ROUNDBOUQUET:
+                    case BOUQUETLEG:
+                        // Для этих типов альбом id 8 и форма SIZE
+                        order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
+                        handleAlbumImages(8, chatId, stageController.getStageByID(8).getTitle(), SIZE);
+                        log.info("Transitioning to album for ROUNDBOUQUET/BOUQUETLEG for order: {}", order.getId_order());
+                        break;
+
+                    case ROUNDBOX:
+                    case SQUAREBOX:
+                        // Для этих типов используем альбом id 10 (заголовок из stage id 9) и форму SIZE
+                        order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
+                        handleAlbumImages(10, chatId, stageController.getStageByID(9).getTitle(), SIZE);
+                        log.info("Transitioning to album for ROUNDBOX/SQUAREBOX for order: {}", order.getId_order());
+                        break;
+
+                    default:
+                        log.warn("Unhandled order type: {} for order: {}", order.getType(), order.getId_order());
+                        // Можно задать какое-либо значение по умолчанию или вернуть ошибку
+                        order.setStateOrder(STATETURNBOT.TYPE);
+                        formBySTATEMESSAGE(chatId, SIZE);
+                        break;
                 }
                 break;
+
             case TYPE:
-                order.setType(null);
-                order.setStateOrder(STATETURNBOT.NEW); // Начальное состояние
-                log.info("Order reset to initial state.");
-                startCommandReceived(chatId, nickName);
-
-                break;
-            case SUBTYPEBOUQET:
-                if (order.getType() == ROUNDBOUQUET ||order.getType() == BOUQUETLEG) {
-                    order.setType(BOUQUET);
-                    order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
-                    formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
-                } else{
+                if (order.getType() != null) {
+                    log.debug("Resetting type for order: {}", order.getId_order());
                     order.setType(null);
-                    order.setStateOrder(STATETURNBOT.TYPE);
-                    formBySTATEMESSAGE(chatId, TYPE);
                 }
+                order.setStateOrder(STATETURNBOT.NEW);
+                formBySTATEMESSAGE(chatId, TYPE);
+                log.info("Order reset to initial state for order: {}", order.getId_order());
+                break;
 
+            case SUBTYPEBOUQET:
+                if (order.getType() == ROUNDBOUQUET ||order.getType() == BOUQUETLEG){
+                    if (order.getType() != null) {
+                        log.debug("Resetting type for order: {}", order.getId_order());
+                        order.setType(null);
+                    }
+                    order.setStateOrder(STATETURNBOT.TYPE);
+                    formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
+                }
                 break;
             case SUBTYPEBOX:
-                if (order.getType() == SQUAREBOX ||order.getType() == ROUNDBOX) {
-                    order.setType(BOX);
-                    order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
-                    formBySTATEMESSAGE(chatId, SUBTYPEBOX);
-                }else{
-                    order.setType(null);
+                if (order.getType() == SQUAREBOX ||order.getType() == ROUNDBOX){
+                    if (order.getType() != null) {
+                        log.debug("Resetting type for order: {}", order.getId_order());
+                        order.setType(null);
+                    }
                     order.setStateOrder(STATETURNBOT.TYPE);
-                    formBySTATEMESSAGE(chatId, TYPE);
+                    formBySTATEMESSAGE(chatId, SUBTYPEBOX);
                 }
-
-
                 break;
+
             default:
-                log.warn("Unknown state: " + currentState);
-                return;
+                log.warn("Unknown state '{}' for order {}. Resetting to NEW state.", currentState, order.getId_order());
+                order.setStateOrder(STATETURNBOT.NEW);
+                formBySTATEMESSAGE(chatId, TYPE);
+                break;
         }
 
         orderController.saveUpdateOrder(order);
-        log.info("Order updated: " + order.toString());
-
-
-
+        log.info("Order updated: {}", order);
     }
+
 
 
 
