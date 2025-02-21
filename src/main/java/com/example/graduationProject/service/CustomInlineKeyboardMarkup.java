@@ -54,9 +54,9 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
     public InlineKeyboardMarkup addDefaultLine(InlineKeyboardMarkup inlineKeyboard){
 
-        InlineKeyboardButton backButton = createInlineKeyboardButtonSetTextAndSetCallBack("Назад", "/back");
-        InlineKeyboardButton contactSellerButton = createInlineKeyboardButtonSetTextAndSetCallBack("Cвязь с продавцом", "/contactseller");
-        InlineKeyboardButton exitButton = createInlineKeyboardButtonSetTextAndSetCallBack("Отменити заказ", "/exit");
+        InlineKeyboardButton backButton = createInlineKeyboardButtonSetTextAndSetCallBack("Назад", "back");
+        InlineKeyboardButton contactSellerButton = createInlineKeyboardButtonSetTextAndSetCallBack("Cвязь с продавцом", "contactseller");
+        InlineKeyboardButton exitButton = createInlineKeyboardButtonSetTextAndSetCallBack("Отменити заказ", "exit");
 
         addRowsInLine(backButton,  exitButton);
         addRowsInLine(contactSellerButton);

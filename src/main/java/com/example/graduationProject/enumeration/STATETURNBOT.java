@@ -4,5 +4,12 @@ public enum STATETURNBOT {
     NEW,
     UNDER,
     WEB,
-    CHAT
+    CHAT,
+    TYPE,
+    FOR_WHOM,
+    SUBJECT,
+    COLOR,
+    SIZE,
+    SUBTYPEBOUQET,
+    SUBTYPEBOX
 }

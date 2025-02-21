@@ -120,6 +120,14 @@ public class Order {
         return color;
     }
 
+    public STATETURNBOT getStateOrder() {
+        return stateOrder;
+    }
+
+    public void setStateOrder(STATETURNBOT stateOrder) {
+        this.stateOrder = stateOrder;
+    }
+
     public void setColor(COLORCOMBO color) {
         this.color = color;
     }

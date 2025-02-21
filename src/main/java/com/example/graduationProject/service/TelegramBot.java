@@ -42,6 +42,7 @@ import static com.example.graduationProject.enumeration.FORWHOM.*;
 import static com.example.graduationProject.enumeration.SIZE.*;
 import static com.example.graduationProject.enumeration.STATEMESSAGE.*;
 import static com.example.graduationProject.enumeration.SUBJECT.*;
+import static com.example.graduationProject.enumeration.TYPEORDER.*;
 
 @Slf4j
 @Component
@@ -255,15 +256,15 @@ public class TelegramBot extends TelegramLongPollingBot{
                         log.info("/pallet handled successfully.");
                         break;
                     case "round_bouquet":
-                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.ROUNDBOUQUET);
+                        setTypeOrderByCallBack(chatID, nickName, ROUNDBOUQUET);
                         handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
                         break;
                     case "little_bag_bouquet":
-                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.BOUQUETLEG);
+                        setTypeOrderByCallBack(chatID, nickName, BOUQUETLEG);
                         handleAlbumImages(8,chatID, stageController.getStageByID(8).getTitle(), SIZE);
                         break;
                     case "circle_box":
-                        setTypeOrderByCallBack(chatID, nickName,TYPEORDER.ROUNDBOX);
+                        setTypeOrderByCallBack(chatID, nickName, ROUNDBOX);
                         handleAlbumImages(10,chatID, stageController.getStageByID(9).getTitle(), SIZE);
                         break;
                     case "square_box":
@@ -398,11 +399,100 @@ public class TelegramBot extends TelegramLongPollingBot{
                     case "cream":
                         setColorOrderByCallBack(chatID,nickName,CREAM);
                         break;
+                    case "back":
+                        backForm(chatID, nickName);
+                        break;
                 }
             } catch (Exception e) {
                 log.error("Error handling callback: " + e.getMessage());
             }
         }
+    }
+
+    private void backForm(long chatId, String nickName){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+
+        if (order == null) {
+            log.warn("No order found for user: " + nickName);
+            return;
+        }
+
+        STATETURNBOT currentState = order.getStateOrder();
+        log.info("Current state: " + currentState);
+
+        switch (currentState) {
+            case COLOR:
+                order.setColor(null);
+                order.setStateOrder(STATETURNBOT.SUBJECT);
+                formBySTATEMESSAGE(chatId, SUBJECT);
+                break;
+            case SUBJECT:
+                order.setSubject(null);
+                order.setStateOrder(STATETURNBOT.FOR_WHOM);
+                formBySTATEMESSAGE(chatId, FOR_WHOM);
+                break;
+            case FOR_WHOM:
+                order.setFromWhom(null);
+                order.setStateOrder(STATETURNBOT.SIZE);
+                formBySTATEMESSAGE(chatId, SIZE);
+
+                break;
+            case SIZE:
+                if (order.getType() == ROUNDBOUQUET ||order.getType() == BOUQUETLEG) {
+                    order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
+                    formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
+                } else if (order.getType() == SQUAREBOX ||order.getType() == ROUNDBOX) {
+                    order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
+                    formBySTATEMESSAGE(chatId, SUBTYPEBOX);
+                } else {
+                    order.setSize(null);
+                    order.setStateOrder(STATETURNBOT.TYPE);
+                    formBySTATEMESSAGE(chatId, TYPE);
+                }
+                break;
+            case TYPE:
+                order.setType(null);
+                order.setStateOrder(STATETURNBOT.NEW); // Начальное состояние
+                log.info("Order reset to initial state.");
+                startCommandReceived(chatId, nickName);
+
+                break;
+            case SUBTYPEBOUQET:
+                if (order.getType() == ROUNDBOUQUET ||order.getType() == BOUQUETLEG) {
+                    order.setType(BOUQUET);
+                    order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
+                    formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
+                } else{
+                    order.setType(null);
+                    order.setStateOrder(STATETURNBOT.TYPE);
+                    formBySTATEMESSAGE(chatId, TYPE);
+                }
+
+                break;
+            case SUBTYPEBOX:
+                if (order.getType() == SQUAREBOX ||order.getType() == ROUNDBOX) {
+                    order.setType(BOX);
+                    order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
+                    formBySTATEMESSAGE(chatId, SUBTYPEBOX);
+                }else{
+                    order.setType(null);
+                    order.setStateOrder(STATETURNBOT.TYPE);
+                    formBySTATEMESSAGE(chatId, TYPE);
+                }
+
+
+                break;
+            default:
+                log.warn("Unknown state: " + currentState);
+                return;
+        }
+
+        orderController.saveUpdateOrder(order);
+        log.info("Order updated: " + order.toString());
+
+
+
     }
 
 
@@ -424,6 +514,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
         log.info(order.toString());
+        order.setStateOrder(STATETURNBOT.SUBJECT);
         switch (subject){
             case WEDDING:
                 order.setSubject(WEDDING);
@@ -462,6 +553,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                 order.setSubject(MEDICAL_WORKERS_DAY);
                 break;
         }
+
         orderController.saveUpdateOrder(order);
         order = orderController.getLastOrderByUserId(idUsers);
         log.info(order.toString());
@@ -472,6 +564,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
         log.info(order.toString());
+        order.setStateOrder(STATETURNBOT.COLOR);
         switch (color){
             case RED:
                 order.setColor(RED);
@@ -517,6 +610,8 @@ public class TelegramBot extends TelegramLongPollingBot{
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
         log.info(order.toString());
+        order.setStateOrder(STATETURNBOT.SIZE);
+
         switch (size){
             case SMALL:
                 order.setSize(SMALL);
@@ -538,6 +633,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
         log.info(order.toString());
+        order.setStateOrder(STATETURNBOT.FOR_WHOM);
         switch (forwhom){
             case HE:
                 order.setFromWhom(HE);
@@ -559,30 +655,39 @@ public class TelegramBot extends TelegramLongPollingBot{
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
         log.info(order.toString());
+
         switch (type){
             case BASKET:
                 order.setType(TYPEORDER.BASKET);
+                order.setStateOrder(STATETURNBOT.TYPE);
                 break;
             case BOX:
                 order.setType(TYPEORDER.BOX);
+                order.setStateOrder(STATETURNBOT.TYPE);
                 break;
             case PALLET:
                 order.setType(TYPEORDER.PALLET);
+                order.setStateOrder(STATETURNBOT.TYPE);
                 break;
             case BOUQUET:
                 order.setType(TYPEORDER.BOUQUET);
+                order.setStateOrder(STATETURNBOT.TYPE);
                 break;
             case ROUNDBOX:
-                order.setType(TYPEORDER.ROUNDBOX);
+                order.setType(ROUNDBOX);
+                order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
                 break;
             case SQUAREBOX:
                 order.setType(TYPEORDER.SQUAREBOX);
+                order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
                 break;
             case BOUQUETLEG:
-                order.setType(TYPEORDER.BOUQUETLEG);
+                order.setType(BOUQUETLEG);
+                order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
                 break;
             case ROUNDBOUQUET:
-                order.setType(TYPEORDER.ROUNDBOUQUET);
+                order.setType(ROUNDBOUQUET);
+                order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
                 break;
         }
         orderController.saveUpdateOrder(order);
