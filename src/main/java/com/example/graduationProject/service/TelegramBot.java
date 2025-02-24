@@ -754,189 +754,62 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
     private void setSubjectOrderByCallBack(long chatId, String nickName, SUBJECT subject){
-        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
-        Order order = orderController.getLastOrderByUserId(idUsers);
+        Order order = lastOrderByIdUsers(chatId, nickName);
         log.info(order.toString());
         order.setStateOrder(STATETURNBOT.SUBJECT);
-        switch (subject){
-            case WEDDING:
-                order.setSubject(WEDDING);
-                break;
-            case MARCH_8:
-                order.setSubject(MARCH_8);
-                break;
-            case BIRTHDAY:
-                order.setSubject(BIRTHDAY);
-                break;
-            case NEW_YEAR:
-                order.setSubject(NEW_YEAR);
-                break;
-            case CORPORATE:
-                order.setSubject(CORPORATE);
-                break;
-            case LAST_BELL:
-                order.setSubject(LAST_BELL);
-                break;
-            case COACHS_DAY:
-                order.setSubject(COACHS_DAY);
-                break;
-            case FEBRUARY_23:
-                order.setSubject(FEBRUARY_23);
-                break;
-            case SEPTEMBER_1:
-                order.setSubject(SEPTEMBER_1);
-                break;
-            case TEACHERS_DAY:
-                order.setSubject(TEACHERS_DAY);
-                break;
-            case EDUCATORS_DAY:
-                order.setSubject(EDUCATORS_DAY);
-                break;
-            case MEDICAL_WORKERS_DAY:
-                order.setSubject(MEDICAL_WORKERS_DAY);
-                break;
-        }
-
-        orderController.saveUpdateOrder(order);
-        order = orderController.getLastOrderByUserId(idUsers);
-        log.info(order.toString());
+        order.setSubject(subject);
         orderController.saveUpdateOrder(order);
     }
 
     private void setColorOrderByCallBack(long chatId, String nickName, COLORCOMBO color){
-        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
-        Order order = orderController.getLastOrderByUserId(idUsers);
+        Order order = lastOrderByIdUsers(chatId, nickName);
         log.info(order.toString());
         order.setStateOrder(STATETURNBOT.COLOR);
-        switch (color){
-            case RED:
-                order.setColor(RED);
-                break;
-            case SKY:
-                order.setColor(SKY);
-                break;
-            case BLUE:
-                order.setColor(BLUE);
-                break;
-            case PINK:
-                order.setColor(PINK);
-                break;
-            case BROWN:
-                order.setColor(BROWN);
-                break;
-            case CREAM:
-                order.setColor(CREAM);
-                break;
-            case GREEN:
-                order.setColor(GREEN);
-                break;
-            case PURPLE:
-                order.setColor(PURPLE);
-                break;
-            case VIOLET:
-                order.setColor(VIOLET);
-                break;
-            case YELLOW:
-                order.setColor(YELLOW);
-                break;
-            case DARK_GREEN:
-                order.setColor(DARK_GREEN);
-                break;
-        }
-        orderController.saveUpdateOrder(order);
-        order = orderController.getLastOrderByUserId(idUsers);
-        log.info(order.toString());
+        order.setColor(color);
         orderController.saveUpdateOrder(order);
     }
 
     private void setSizeOrderByCallBack(long chatId, String nickName, SIZE size){
-        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
-        Order order = orderController.getLastOrderByUserId(idUsers);
+        Order order = lastOrderByIdUsers(chatId, nickName);
         log.info(order.toString());
         order.setStateOrder(STATETURNBOT.SIZE);
-
-        switch (size){
-            case SMALL:
-                order.setSize(SMALL);
-                break;
-            case MEDIUM:
-                order.setSize(MEDIUM);
-                break;
-            case LARGE:
-                order.setSize(LARGE);
-                break;
-        }
-        orderController.saveUpdateOrder(order);
-        order = orderController.getLastOrderByUserId(idUsers);
-        log.info(order.toString());
+        order.setSize(size);
         orderController.saveUpdateOrder(order);
     }
 
     private void setGenderOrderByCallBack(long chatId, String nickName, FORWHOM forwhom){
-        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
-        Order order = orderController.getLastOrderByUserId(idUsers);
-        log.info(order.toString());
+        Order order = lastOrderByIdUsers(chatId, nickName);
         order.setStateOrder(STATETURNBOT.FOR_WHOM);
-        switch (forwhom){
-            case HE:
-                order.setFromWhom(HE);
-                break;
-            case SHE:
-                order.setFromWhom(SHE);
-                break;
-            case NOTHING:
-                order.setFromWhom(NOTHING);
-                break;
-        }
-        orderController.saveUpdateOrder(order);
-        order = orderController.getLastOrderByUserId(idUsers);
-        log.info(order.toString());
+        order.setFromWhom(forwhom);
         orderController.saveUpdateOrder(order);
     }
 
     private void setTypeOrderByCallBack(long chatId, String nickName, TYPEORDER type){
-        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
-        Order order = orderController.getLastOrderByUserId(idUsers);
+        Order order = lastOrderByIdUsers(chatId, nickName);
         log.info(order.toString());
-
+        order.setType(type);
         switch (type){
             case BASKET:
-                order.setType(TYPEORDER.BASKET);
-                order.setStateOrder(STATETURNBOT.TYPE);
-                break;
             case BOX:
-                order.setType(TYPEORDER.BOX);
-                order.setStateOrder(STATETURNBOT.TYPE);
-                break;
             case PALLET:
-                order.setType(TYPEORDER.PALLET);
-                order.setStateOrder(STATETURNBOT.TYPE);
-                break;
             case BOUQUET:
-                order.setType(TYPEORDER.BOUQUET);
                 order.setStateOrder(STATETURNBOT.TYPE);
                 break;
             case ROUNDBOX:
-                order.setType(ROUNDBOX);
-                order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
-                break;
             case SQUAREBOX:
-                order.setType(TYPEORDER.SQUAREBOX);
                 order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
                 break;
             case BOUQUETLEG:
-                order.setType(BOUQUETLEG);
-                order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
-                break;
             case ROUNDBOUQUET:
-                order.setType(ROUNDBOUQUET);
                 order.setStateOrder(STATETURNBOT.SUBTYPEBOUQET);
                 break;
         }
         orderController.saveUpdateOrder(order);
-        order = orderController.getLastOrderByUserId(idUsers);
-        log.info(order.toString());
-        orderController.saveUpdateOrder(order);
+    }
+
+    private Order lastOrderByIdUsers(long chatId, String nickName){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        return orderController.getLastOrderByUserId(idUsers);
     }
 
 
