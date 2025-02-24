@@ -487,24 +487,6 @@ public class TelegramBot extends TelegramLongPollingBot{
             if (currentDataFilled) {
                 switch (currentState) {
                     case SIZE:
-                        formBySTATEMESSAGE(chatId, SIZE);
-                        break;
-                    case FOR_WHOM:
-                        formBySTATEMESSAGE(chatId, FOR_WHOM);
-                        break;
-                    case COLOR:
-                        formBySTATEMESSAGE(chatId, COLOR);
-                        break;
-                    case SUBJECT:
-                        formBySTATEMESSAGE(chatId, SUBJECT);
-                        break;
-                    case SUBTYPEBOUQET:
-                        formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
-                        break;
-                    case SUBTYPEBOX:
-                        formBySTATEMESSAGE(chatId, SUBTYPEBOX);
-                        break;
-                    case TYPE:
                         switch (order.getType()) {
                             case BASKET:
                                 handleAlbumImages(6, chatId, stageController.getStageByID(6).getTitle(), SIZE);
@@ -529,10 +511,28 @@ public class TelegramBot extends TelegramLongPollingBot{
                                 break;
                             case ROUNDBOX:
                             case SQUAREBOX:
-                                handleAlbumImages(10, chatId, stageController.getStageByID(9).getTitle(), SIZE);
+                                handleAlbumImages(9, chatId, stageController.getStageByID(9).getTitle(), SIZE);
                                 log.info("Transitioning to album for ROUNDBOX/SQUAREBOX for order: {}", order.getId_order());
                                 break;
                         }
+                        break;
+                    case FOR_WHOM:
+                        formBySTATEMESSAGE(chatId, FOR_WHOM);
+                        break;
+                    case COLOR:
+                        formBySTATEMESSAGE(chatId, COLOR);
+                        break;
+                    case SUBJECT:
+                        formBySTATEMESSAGE(chatId, SUBJECT);
+                        break;
+                    case SUBTYPEBOUQET:
+                        formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
+                        break;
+                    case SUBTYPEBOX:
+                        formBySTATEMESSAGE(chatId, SUBTYPEBOX);
+                        break;
+                    case TYPE:
+                        formBySTATEMESSAGE(chatId, TYPE);
                         break;
                 }
             } else {
@@ -682,7 +682,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     case SQUAREBOX:
                         // Для этих типов используем альбом id 10 (заголовок из stage id 9) и форму SIZE
                         order.setStateOrder(STATETURNBOT.SUBTYPEBOX);
-                        handleAlbumImages(10, chatId, stageController.getStageByID(9).getTitle(), SIZE);
+                        handleAlbumImages(9, chatId, stageController.getStageByID(9).getTitle(), SIZE);
                         log.info("Transitioning to album for ROUNDBOX/SQUAREBOX for order: {}", order.getId_order());
                         break;
 
