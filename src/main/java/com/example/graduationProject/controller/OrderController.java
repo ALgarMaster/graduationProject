@@ -99,7 +99,8 @@ public class OrderController {
         } catch (Exception e) {
             // Логируем ошибку
             log.error("Error occurred while fetching the last order for user id {}: {}", userId, e.getMessage(), e);
-            return null;
+
+            throw  e;
         }
     }
 

@@ -79,6 +79,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             log.info("Chat id: "+ chatID);
             int idOrder;
             int idUsers;
+            orderIsNullByUserId(chatID, update.getMessage().getFrom().getUserName());
 
             switch (messageText){
                 case "/start":
@@ -99,6 +100,9 @@ public class TelegramBot extends TelegramLongPollingBot{
                     }catch (Exception e){
                         log.error("Error main bot " + e.getMessage());
                     }
+                    break;
+                case "/createUserInTheDB":
+                    idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
                     break;
                 case "/createOrder":
                     idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
@@ -232,9 +236,19 @@ public class TelegramBot extends TelegramLongPollingBot{
             CallbackQuery callbackQuery = update.getCallbackQuery();
             String callbackData = callbackQuery.getData();
             long chatID = callbackQuery.getMessage().getChatId();
+            orderIsNullByUserId(chatID, nickName);
 
             try {
                 switch (callbackData) {
+                    case "backToOrder":
+                        backToOrder(chatID, nickName);
+                        break;
+                    case "orderCancellation":
+                        orderCancel(chatID, nickName);
+                        break;
+                    case "exit":
+                        orderCancellationConfirmation(chatID);
+                        break;
                     case "basket":
                         setTypeOrderByCallBack(chatID, nickName,TYPEORDER.BASKET);
                         handleAlbumImages(6,chatID, stageController.getStageByID(6).getTitle(), SIZE);
@@ -409,6 +423,179 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
+    private void orderIsNullByUserId(long chatId, String nickName){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+        if(order == null){orderController.saveUpdateOrder(new Order(idUsers));}
+    }
+
+    private  void orderCancel(long chatId, String nickName){
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
+        orderController.deleteOrderByOrder(order);
+        orderIsNullByUserId(chatId, nickName);
+        sendMessage(chatId, "Начните собирать ваш заказ!");
+
+    }
+
+    private void backToOrder(long chatId, String nickName) {
+        try {
+            int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+            Order order = orderController.getLastOrderByUserId(idUsers);
+
+            if (order == null) {
+                log.warn("No order found for user: {}", nickName);
+                return;
+            }
+
+            // Получаем текущий этап
+            STATETURNBOT currentState = order.getStateOrder();
+            log.info("BackToOrder: current state for user {}: {}", nickName, currentState);
+
+            // Флаг, который указывает, что данные для текущего этапа заполнены
+            boolean currentDataFilled = false;
+
+            // Здесь производится проверка заполненности данных для каждого этапа.
+            switch (currentState) {
+                case COLOR:
+                    currentDataFilled = (order.getColor() != null);
+                    break;
+                case SUBJECT:
+                    currentDataFilled = (order.getSubject() != null);
+                    break;
+                case FOR_WHOM:
+                    currentDataFilled = (order.getFromWhom() != null);
+                    break;
+                case SIZE:
+                    currentDataFilled = (order.getSize() != null);
+                    break;
+                case TYPE:
+                    currentDataFilled = (order.getType() != null);
+                    break;
+                case SUBTYPEBOUQET:
+                    currentDataFilled = (order.getType() != null);
+                    break;
+                case SUBTYPEBOX:
+                    currentDataFilled = (order.getType() != null);
+                    break;
+                default:
+                    currentDataFilled = false;
+                    break;
+            }
+
+            // Если поле этапа и данные для него заполнены, остаёмся на этом этапе и выдаём соответствующую форму.
+            if (currentDataFilled) {
+                switch (currentState) {
+                    case SIZE:
+                        formBySTATEMESSAGE(chatId, SIZE);
+                        break;
+                    case FOR_WHOM:
+                        formBySTATEMESSAGE(chatId, FOR_WHOM);
+                        break;
+                    case COLOR:
+                        formBySTATEMESSAGE(chatId, COLOR);
+                        break;
+                    case SUBJECT:
+                        formBySTATEMESSAGE(chatId, SUBJECT);
+                        break;
+                    case SUBTYPEBOUQET:
+                        formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
+                        break;
+                    case SUBTYPEBOX:
+                        formBySTATEMESSAGE(chatId, SUBTYPEBOX);
+                        break;
+                    case TYPE:
+                        switch (order.getType()) {
+                            case BASKET:
+                                handleAlbumImages(6, chatId, stageController.getStageByID(6).getTitle(), SIZE);
+                                log.info("Transitioning to album for BASKET for order: {}", order.getId_order());
+                                break;
+                            case PALLET:
+                                handleAlbumImages(7, chatId, stageController.getStageByID(7).getTitle(), SIZE);
+                                log.info("Transitioning to album for PALLET for order: {}", order.getId_order());
+                                break;
+                            case BOUQUET:
+                                handleAlbumImages(10, chatId, stageController.getStageByID(10).getTitle(), SUBTYPEBOUQET);
+                                log.info("Transitioning to album for BOUQUET for order: {}", order.getId_order());
+                                break;
+                            case BOX:
+                                handleAlbumImages(11, chatId, stageController.getStageByID(11).getTitle(), SUBTYPEBOX);
+                                log.info("Transitioning to album for BOX for order: {}", order.getId_order());
+                                break;
+                            case ROUNDBOUQUET:
+                            case BOUQUETLEG:
+                                handleAlbumImages(8, chatId, stageController.getStageByID(8).getTitle(), SIZE);
+                                log.info("Transitioning to album for ROUNDBOUQUET/BOUQUETLEG for order: {}", order.getId_order());
+                                break;
+                            case ROUNDBOX:
+                            case SQUAREBOX:
+                                handleAlbumImages(10, chatId, stageController.getStageByID(9).getTitle(), SIZE);
+                                log.info("Transitioning to album for ROUNDBOX/SQUAREBOX for order: {}", order.getId_order());
+                                break;
+                        }
+                        break;
+                }
+            } else {
+                // Иначе переводим на следующий этап согласно логике.
+                switch (currentState) {
+                    case SUBTYPEBOX:
+                    case SUBTYPEBOUQET:
+                        formBySTATEMESSAGE(chatId, SIZE);
+                        break;
+                    case SUBJECT:
+                        formBySTATEMESSAGE(chatId, COLOR);
+                        break;
+                    case FOR_WHOM:
+                        formBySTATEMESSAGE(chatId, SUBJECT);
+                        break;
+                    case SIZE:
+                        formBySTATEMESSAGE(chatId, FOR_WHOM);
+                        break;
+                    case TYPE:
+                        if (order.getType() == ROUNDBOUQUET || order.getType() == BOUQUETLEG) {
+                            formBySTATEMESSAGE(chatId, SUBTYPEBOUQET);
+                        } else if (order.getType() == SQUAREBOX || order.getType() == ROUNDBOX) {
+                            formBySTATEMESSAGE(chatId, SUBTYPEBOX);
+                        } else {
+                            formBySTATEMESSAGE(chatId, SIZE);
+                        }
+                        break;
+                    case NEW:
+                        formBySTATEMESSAGE(chatId, TYPE);
+                        break;
+                }
+            }
+
+            orderController.saveUpdateOrder(order);
+            log.info("Order updated: {}", order);
+
+        } catch (Exception e) {
+            // Логируем ошибку
+            log.error("Error occurred while processing the order for user {}: {}", nickName, e.getMessage(), e);
+
+            // Перебрасываем исключение
+            throw e;
+        }
+    }
+
+
+
+    private  void orderCancellationConfirmation(long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        String textToSend = "Вы точно хотите отменить заказ?";
+        message.setText(textToSend);
+
+        CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+
+        message.setReplyMarkup(inlineKeyboard.canselLine(inlineKeyboard));
+        try {
+            execute(message);
+        }catch (TelegramApiException e){
+            log.error("Error tg exception orderCancellationConfirmation" + e.getMessage());
+        }
+    }
+
     private void backForm(long chatId, String nickName) {
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
@@ -562,7 +749,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             log.info("sizeForm handled successfully.");
 
         }catch (Exception e){
-            log.error("Error main bot in sizeForm" + e.getMessage());
+            log.error("Error main bot in sizeForm " + e.getMessage());
         }
     }
 

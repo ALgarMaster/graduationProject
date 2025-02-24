@@ -49,7 +49,17 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
     }
 
 
+    public InlineKeyboardMarkup canselLine(InlineKeyboardMarkup inlineKeyboard){
 
+
+        InlineKeyboardButton exitButton = createInlineKeyboardButtonSetTextAndSetCallBack("Отменить заказ", "orderCancellation");
+        InlineKeyboardButton backToOrderButton = createInlineKeyboardButtonSetTextAndSetCallBack("Вернутся к заказу", "backToOrder");
+
+        addRowsInLine(backToOrderButton,  exitButton);
+        inlineKeyboard.setKeyboard(rowsInLine);
+
+        return inlineKeyboard;
+    }
 
 
     public InlineKeyboardMarkup addDefaultLine(InlineKeyboardMarkup inlineKeyboard){
