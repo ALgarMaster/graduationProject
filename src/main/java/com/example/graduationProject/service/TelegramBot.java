@@ -25,6 +25,8 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.example.graduationProject.DAO.ImageDAO;
 
@@ -240,6 +242,9 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             try {
                 switch (callbackData) {
+                    case "contactseller":
+                        sendMessageWithInlineKeyboard(chatID, "https://t.me/ostukalova");
+                        break;
                     case "backToOrder":
                         backToOrder(chatID, nickName);
                         break;
@@ -575,6 +580,27 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             // Перебрасываем исключение
             throw e;
+        }
+    }
+
+    public void sendMessageWithInlineKeyboard(Long chatId, String Url) {
+        // Создаем объект клавиатуры с кнопками
+        CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+
+
+        String messageText = "Перейдите по ссылке для подтверждения и оплаты заказа: "+Url;
+
+        // Создаем объект для отправки сообщения
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(messageText);
+        message.setReplyMarkup(inlineKeyboard.addLinkWithButtons(inlineKeyboard, Url)); // Прикрепляем клавиатуру
+
+        try {
+            // Отправляем сообщение
+            execute(message);
+        } catch (Exception e) {
+            e.printStackTrace(); // Обработка ошибок
         }
     }
 

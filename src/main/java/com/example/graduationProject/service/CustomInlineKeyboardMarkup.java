@@ -14,7 +14,6 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
 
     CustomInlineKeyboardMarkup(){
-
         rowsInLine = new ArrayList<>();
     }
 
@@ -47,6 +46,24 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
         return inlineKeyboard;
     }
+
+    public InlineKeyboardMarkup addLinkWithButtons(InlineKeyboardMarkup inlineKeyboard, String backUrl) {
+
+        // Создание кнопок
+        InlineKeyboardButton chatButton = new InlineKeyboardButton();
+        chatButton.setText("Перейдите в чат с продавцом");
+        chatButton.setUrl(backUrl); // Ссылка на чат с продавцом
+
+        InlineKeyboardButton backButton =  createInlineKeyboardButtonSetTextAndSetCallBack("Назад к заказу", "backToOrder");
+         // Ссылка для возврата назад
+
+        // Добавление кнопок в строки клавиатуры
+        addRowsInLine(backButton,chatButton);
+        inlineKeyboard.setKeyboard(rowsInLine);
+
+        return inlineKeyboard;
+    }
+
 
 
     public InlineKeyboardMarkup canselLine(InlineKeyboardMarkup inlineKeyboard){
