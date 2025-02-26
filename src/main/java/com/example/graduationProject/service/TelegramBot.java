@@ -5,39 +5,31 @@ import com.example.graduationProject.controller.ImagesController;
 import com.example.graduationProject.controller.OrderController;
 import com.example.graduationProject.controller.StageController;
 import com.example.graduationProject.controller.UsersController;
-import com.example.graduationProject.entities.Images;
 import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Stage;
 import com.example.graduationProject.enumeration.*;
-import com.example.graduationProject.repository.ImagesRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.*;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.example.graduationProject.DAO.ImageDAO;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.example.graduationProject.enumeration.COLORCOMBO.*;
 import static com.example.graduationProject.enumeration.FORWHOM.*;
@@ -49,7 +41,7 @@ import static com.example.graduationProject.enumeration.TYPEORDER.*;
 @Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot{
-
+//    private final Map<Long, List<Integer>> botMessageIds = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
     private ImagesController imagesController;
@@ -69,9 +61,6 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.usersController = usersController;
     }
 
-
-    //поик по айди чата объекта заказа и дальнейшее взаимодействие через чат ади с заказом, запись и поиск.
-    //написать в субботу обработчик колбеков if (update.hasMessage() && update.getMessage().hasText()){...}else if (update.hasCallbackQuery()){...}
     @Override
     public void onUpdateReceived(Update update) {
 
@@ -80,11 +69,13 @@ public class TelegramBot extends TelegramLongPollingBot{
             long chatID = update.getMessage().getChatId();
             log.info("Chat id: "+ chatID);
             int idOrder;
-            int idUsers;
+            int idUsers ;
             orderIsNullByUserId(chatID, update.getMessage().getFrom().getUserName());
+
 
             switch (messageText){
                 case "/start":
+                    idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
                     try {
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
 //                        Order order = new Order();
@@ -239,6 +230,9 @@ public class TelegramBot extends TelegramLongPollingBot{
             String callbackData = callbackQuery.getData();
             long chatID = callbackQuery.getMessage().getChatId();
             orderIsNullByUserId(chatID, nickName);
+
+
+
 
             try {
                 switch (callbackData) {
@@ -428,6 +422,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
+
     private void orderIsNullByUserId(long chatId, String nickName){
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
         Order order = orderController.getLastOrderByUserId(idUsers);
@@ -489,7 +484,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             }
 
             // Если поле этапа и данные для него заполнены, остаёмся на этом этапе и выдаём соответствующую форму.
-            if (currentDataFilled) {
+            if (!currentDataFilled) {
                 switch (currentState) {
                     case SIZE:
                         switch (order.getType()) {
@@ -603,6 +598,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             e.printStackTrace(); // Обработка ошибок
         }
     }
+
 
 
 
@@ -909,9 +905,9 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    // сделать так чтобы можно было менять подпись альбома
+    // сделать, так чтобы можно было менять подпись альбома
     // Функция для отправки нескольких изображений
-    //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
+    //Сделать, так чтобы по множеству стейтмасседж подставлялась нужная клавиатура
     // Функция для отправки нескольких изображений с возможностью изменить подпись альбома
     private void sendMultipleImages(List<File> imagesFileList, long chatID, String title, STATEMESSAGE statemessage) {
         try {
