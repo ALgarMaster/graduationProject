@@ -41,7 +41,7 @@ import static com.example.graduationProject.enumeration.TYPEORDER.*;
 @Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot{
-//    private final Map<Long, List<Integer>> botMessageIds = new ConcurrentHashMap<>();
+    private Map<Long, List<Long>> messagesMap = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(TelegramBot.class);
     final BotConfiguration botConfiguration;
     private ImagesController imagesController;
@@ -231,7 +231,8 @@ public class TelegramBot extends TelegramLongPollingBot{
             long chatID = callbackQuery.getMessage().getChatId();
             orderIsNullByUserId(chatID, nickName);
 
-
+            logMessagesMap();
+            clearMessagesForChat(chatID);
 
 
             try {
@@ -422,6 +423,58 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
+    private void logMessagesMap() {
+        if (messagesMap.isEmpty()) {
+            log.info("messagesMap is empty.");
+            return;
+        }
+
+        log.info("Logging messagesMap contents:");
+        for (Map.Entry<Long, List<Long>> entry : messagesMap.entrySet()) {
+            log.info("Chat ID: " + entry.getKey() + " -> Message IDs: " + entry.getValue());
+        }
+    }
+
+    private void clearMessagesForChat(long chatId) {
+        List<Long> messageIds = messagesMap.get(chatId);
+
+        if (messageIds != null && !messageIds.isEmpty()) {
+            for (Long messageId : messageIds) {
+                try {
+                    execute(new DeleteMessage(String.valueOf(chatId), Math.toIntExact(messageId)));
+                    log.info("Deleted message ID: " + messageId + " for chat ID: " + chatId);
+                } catch (TelegramApiException e) {
+                    log.error("Failed to delete message ID: " + messageId + " for chat ID: " + chatId, e);
+                }
+            }
+            // Очищаем список сообщений, но не удаляем сам chatId из messagesMap
+            messageIds.clear();
+            log.info("Cleared message list for chat ID: " + chatId);
+        } else {
+            log.info("No messages to delete for chat ID: " + chatId);
+        }
+    }
+
+    // Метод для сохранения ID сообщений
+    private void saveMessageIds(long chatId, long messageId) {
+        // Получаем текущий список сообщений для данного чата
+        List<Long> messageIds = messagesMap.get(chatId);
+
+        // Если список сообщений пуст или не существует, создаем новый список
+        if (messageIds == null) {
+            messageIds = new ArrayList<>();
+        }
+
+        // Добавляем ID текущего сообщения в список
+        messageIds.add(messageId);
+
+        // Обновляем список сообщений для данного chatId в мапе
+        messagesMap.put(chatId, messageIds);
+
+        // Выводим все ID сообщений, отправленных в рамках этого чата
+        log.info("Messages sent for chat " + chatId + ": " + messageIds);
+    }
+
 
     private void orderIsNullByUserId(long chatId, String nickName){
         int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
@@ -434,7 +487,8 @@ public class TelegramBot extends TelegramLongPollingBot{
         Order order = orderController.getLastOrderByUserId(idUsers);
         orderController.deleteOrderByOrder(order);
         orderIsNullByUserId(chatId, nickName);
-        sendMessage(chatId, "Начните собирать ваш заказ!");
+
+        formBySTATEMESSAGE(chatId, TYPE);
 
     }
 
@@ -593,7 +647,10 @@ public class TelegramBot extends TelegramLongPollingBot{
 
         try {
             // Отправляем сообщение
-            execute(message);
+            Message sentMessage = execute(message);
+            saveMessageIds(chatId, sentMessage.getMessageId());
+
+
         } catch (Exception e) {
             e.printStackTrace(); // Обработка ошибок
         }
@@ -612,7 +669,8 @@ public class TelegramBot extends TelegramLongPollingBot{
 
         message.setReplyMarkup(inlineKeyboard.canselLine(inlineKeyboard));
         try {
-            execute(message);
+            Message sentMessage = execute(message);
+            saveMessageIds(chatId, sentMessage.getMessageId());
         }catch (TelegramApiException e){
             log.error("Error tg exception orderCancellationConfirmation" + e.getMessage());
         }
@@ -898,7 +956,9 @@ public class TelegramBot extends TelegramLongPollingBot{
             // Отправляем одно изображение
             //сделать свитч с стейтмами с клавиатурами
             sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard,statemessage));
-            execute(sendPhoto);
+
+            Message sentMessage = execute(sendPhoto);
+            saveMessageIds(chatID, sentMessage.getMessageId());
             log.info("Single image sent successfully.");
         } catch (Exception e) {
             log.error("Error sending single image: " + e.getMessage(), e);
@@ -941,8 +1001,17 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             if (!mediaList.isEmpty()) {
                 sendMediaGroup.setMedias(mediaList);
-                execute(sendMediaGroup);
+
+                // Отправляем альбом и получаем список сообщений
+                List<Message> sentMessages = execute(sendMediaGroup);
+
                 log.info("Album sent successfully.");
+
+                // Сохраняем ID всех сообщений из медиа-группы
+                for (Message message : sentMessages) {
+                    saveMessageIds(chatID, message.getMessageId());
+                }
+
             } else {
                 log.error("No valid images to send.");
                 return;
@@ -966,7 +1035,8 @@ public class TelegramBot extends TelegramLongPollingBot{
             sendMessage.setText(" текст с пояснением ");
             sendMessage.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard, statemessage));
 
-            execute(sendMessage);
+            Message sentMessage = execute(sendMessage);
+            saveMessageIds(chatID, sentMessage.getMessageId());
             log.info("Inline keyboard sent successfully.");
         } catch (Exception e) {
             log.error("Error sending inline keyboard: " + e.getMessage(), e);
@@ -992,7 +1062,8 @@ public class TelegramBot extends TelegramLongPollingBot{
 
         message.setReplyMarkup(inlineKeyboard.typeInlineKeyboard(inlineKeyboard));
         try {
-            execute(message);
+            Message sentMessage = execute(message);
+            saveMessageIds(chatID, sentMessage.getMessageId());
         }catch (TelegramApiException e){
             log.error("Error tg exception" + e.getMessage());
         }
