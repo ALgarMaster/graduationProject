@@ -47,6 +47,16 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         return inlineKeyboard;
     }
 
+    public InlineKeyboardMarkup webForm(InlineKeyboardMarkup inlineKeyboard, String Url){
+        InlineKeyboardButton chatButton = new InlineKeyboardButton();
+        chatButton.setText("Выберите наполнение подарка");
+        chatButton.setUrl(Url);
+        InlineKeyboardButton backButton =  createInlineKeyboardButtonSetTextAndSetCallBack("Назад к заказу", "backToOrder");
+        addRowsInLine(backButton,chatButton);
+        inlineKeyboard.setKeyboard(rowsInLine);
+        return inlineKeyboard;
+    }
+
     public InlineKeyboardMarkup addLinkWithButtons(InlineKeyboardMarkup inlineKeyboard, String backUrl) {
 
         // Создание кнопок

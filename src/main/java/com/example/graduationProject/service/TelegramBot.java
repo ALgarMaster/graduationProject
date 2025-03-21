@@ -146,23 +146,20 @@ public class TelegramBot extends TelegramLongPollingBot{
                     // валидация записи
                     //конечный ответ о результате
 
-                    String imagePath = "C:\\Users\\Stanislav\\Downloads\\23141.jpg";
+                    String imagePath = "C:\\Users\\Stanislav\\Downloads\\13558895.png";
 
                     // Create the CustomMultipartFile
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     ResponseEntity<String> response = null;
                     try {
-                        response = imagesController.uploadImage(file, 11);
+                        response = imagesController.uploadImage(file, 12);
                         log.info("Added writ"+response.getBody());
                     } catch (IOException e) {
                         log.error("Error main bot in /probeImage"+e.getMessage());
                         throw new RuntimeException(e);
                     }
                     break;
-                    //запись в объект выбранного типа подарка и вызов этапа с размером
-
-                    //кейсы с размером, которые вызывают следкющую форму пренадлежности, и записывает данные в объект подарка
 
 
                 case "/":
@@ -225,7 +222,6 @@ public class TelegramBot extends TelegramLongPollingBot{
 
         } else if (update.hasCallbackQuery()) {
             String nickName = update.getCallbackQuery().getFrom().getUserName();
-            int idUsers;
             CallbackQuery callbackQuery = update.getCallbackQuery();
             String callbackData = callbackQuery.getData();
             long chatID = callbackQuery.getMessage().getChatId();
@@ -372,49 +368,61 @@ public class TelegramBot extends TelegramLongPollingBot{
                     //команды с цветами
                     case "red":
                         setColorOrderByCallBack(chatID,nickName,RED);
+                        webForm(chatID);
                         break;
 
                     case "yellow":
                         setColorOrderByCallBack(chatID,nickName,YELLOW);
+                        webForm(chatID);
                         break;
 
                     case "pink":
                         setColorOrderByCallBack(chatID,nickName,PINK);
+                        webForm(chatID);
                         break;
 
                     case "green":
                         setColorOrderByCallBack(chatID,nickName,GREEN);
+                        webForm(chatID);
                         break;
 
                     case "sky":
                         setColorOrderByCallBack(chatID,nickName,SKY);
+                        webForm(chatID);
                         break;
 
                     case "brown":
                         setColorOrderByCallBack(chatID,nickName,BROWN);
+                        webForm(chatID);
                         break;
 
                     case "violet":
                         setColorOrderByCallBack(chatID,nickName,VIOLET);
+                        webForm(chatID);
                         break;
 
                     case "darkGreen":
                         setColorOrderByCallBack(chatID,nickName,DARK_GREEN);
+                        webForm(chatID);
                         break;
 
                     case "purple":
                         setColorOrderByCallBack(chatID,nickName,PURPLE);
+                        webForm(chatID);
                         break;
 
                     case "blue":
                         setColorOrderByCallBack(chatID,nickName,BLUE);
+                        webForm(chatID);
                         break;
 
                     case "cream":
                         setColorOrderByCallBack(chatID,nickName,CREAM);
+                        webForm(chatID);
                         break;
                     case "back":
                         backForm(chatID, nickName);
+
                         break;
                 }
             } catch (Exception e) {
@@ -422,6 +430,32 @@ public class TelegramBot extends TelegramLongPollingBot{
             }
         }
     }
+    //TODO нет отрисовки COLOR c не нул, это баг, нужно исправить.
+
+    private void webForm(long chatId){
+        CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+
+        String Url = "http://192.168.1.228:5173/";
+        String messageText = "Перейдите и выберите наполнение подарка или вернитесь назад.";
+
+
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(messageText);
+        message.setReplyMarkup(inlineKeyboard.webForm(inlineKeyboard, Url));
+
+        try {
+
+            Message sentMessage = execute(message);
+            saveMessageIds(chatId, sentMessage.getMessageId());
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     private void logMessagesMap() {
         if (messagesMap.isEmpty()) {
@@ -455,23 +489,19 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    // Метод для сохранения ID сообщений
+
     private void saveMessageIds(long chatId, long messageId) {
-        // Получаем текущий список сообщений для данного чата
+
         List<Long> messageIds = messagesMap.get(chatId);
 
-        // Если список сообщений пуст или не существует, создаем новый список
         if (messageIds == null) {
             messageIds = new ArrayList<>();
         }
 
-        // Добавляем ID текущего сообщения в список
         messageIds.add(messageId);
 
-        // Обновляем список сообщений для данного chatId в мапе
         messagesMap.put(chatId, messageIds);
 
-        // Выводим все ID сообщений, отправленных в рамках этого чата
         log.info("Messages sent for chat " + chatId + ": " + messageIds);
     }
 

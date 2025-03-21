@@ -134,16 +134,83 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" +
-                "id_order=" + id_order +
-                ", title='" + title + '\'' +
-                ", type=" + type +
-                ", size=" + size +
-                ", stateOrder=" + stateOrder +
-                ", fromWhom=" + fromWhom +
-                ", subject=" + subject +
-                ", color=" + color +
-                ", idUser=" + idUser +
-                '}';
+        StringBuilder message = new StringBuilder();
+
+        message.append("Тип: ").append(type != null ? getReadableType(type) : "Пока не выбран").append("\n");
+        message.append("Размер: ").append(size != null ? getReadableSize(size) : "Пока не выбран").append("\n");
+        message.append("От кого: ").append(fromWhom != null ? getReadableFromWhom(fromWhom) : "Пока не выбран").append("\n");
+        message.append("Праздник: ").append(subject != null ? getReadableSubject(subject) : "Пока не выбран").append("\n");
+        message.append("Цвет: ").append(color != null ? getReadableColor(color) : "Пока не выбран").append("\n");
+        
+        return message.toString();
+    }
+
+
+    private String getReadableType(TYPEORDER type) {
+        switch (type.name()) {
+            case "BASKET": return "Корзина";
+            case "PALLET": return "Паллет";
+            case "BOUQUET": return "Букет";
+            case "BOX": return "Коробка";
+            case "ROUNDBOUQUET": return "Круглый букет";
+            case "BOUQUETLEG": return "Букет с ножкой";
+            case "ROUNDBOX": return "Круглая коробка";
+            case "SQUAREBOX": return "Квадратная коробка";
+            default: return "Пока не выбран";
+        }
+    }
+
+    private String getReadableSize(SIZE size) {
+        switch (size.name()) {
+            case "SMALL": return "Маленький";
+            case "MEDIUM": return "Средний";
+            case "LARGE": return "Большой";
+            default: return "Пока не выбран";
+        }
+    }
+
+    private String getReadableColor(COLORCOMBO color) {
+        switch (color.name()) {
+            case "RED": return "Красный";
+            case "YELLOW": return "Желтый";
+            case "PINK": return "Розовый";
+            case "GREEN": return "Зеленый";
+            case "SKY": return "Небесный";
+            case "BROWN": return "Коричневый";
+            case "VIOLET": return "Фиолетовый";
+            case "DARK_GREEN": return "Темно-зеленый";
+            case "PURPLE": return "Пурпурный";
+            case "BLUE": return "Синий";
+            case "CREAM": return "Кремовый";
+            default: return "Пока не выбран";
+        }
+    }
+
+    private String getReadableFromWhom(FORWHOM fromWhom) {
+        switch (fromWhom.name()) {
+            case "HE": return "Для него";
+            case "SHE": return "Для неё";
+            case "NOTHING": return "Для всех";
+            default: return "Пока не выбран";
+        }
+    }
+
+    private String getReadableSubject(SUBJECT subject) {
+        switch (subject.name()) {
+            case "NEW_YEAR": return "Новый год";
+            case "FEBRUARY_23": return "23 Февраля";
+            case "MARCH_8": return "8 Марта";
+            case "LAST_BELL": return "Последний звонок";
+            case "SEPTEMBER_1": return "1 Сентября";
+            case "TEACHERS_DAY": return "День учителя";
+            case "EDUCATORS_DAY": return "День воспитателя";
+            case "BIRTHDAY": return "День рождения";
+            case "COACHS_DAY": return "День тренера";
+            case "MEDICAL_WORKERS_DAY": return "День медицинского работника";
+            case "WEDDING": return "Свадьба";
+            case "CORPORATE": return "Корпоратив";
+            case "ANY_DAY": return "Любой день";
+            default: return "Пока не выбран";
+        }
     }
 }

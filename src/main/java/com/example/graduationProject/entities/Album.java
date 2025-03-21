@@ -14,14 +14,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "album")
 public class Album {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name ="id_album")
     private int idAlbum;
 
     @Column(name ="name")
     private String name;
 
-    Album( String album_name){
+    public Album(){}
+
+    public Album( String album_name){
         this.name = album_name;
     }
 
