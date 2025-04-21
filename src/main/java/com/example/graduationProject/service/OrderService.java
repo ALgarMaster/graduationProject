@@ -46,8 +46,8 @@ public class OrderService {
         return orderRepository.existsById(id);
     }
 
-    public void updateTitle(int id, String title){
-        orderRepository.updateTitle(id, title);
+    public void updateFilling(int id, String filling){
+        orderRepository.updateFilling(id, filling);
     }
 
     public void updateType(int id, TYPEORDER type){

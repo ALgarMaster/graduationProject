@@ -25,11 +25,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
     // Проверить существование заказа по ID
     boolean existsById(Integer id);
 
-    // Обновление title
-    @Modifying
-    @Transactional
-    @Query("UPDATE Order o SET o.title = :title WHERE o.id_order = :id")
-    void updateTitle(@Param("id") int id, @Param("title") String title);
 
     // Обновление type
     @Modifying
@@ -71,6 +66,11 @@ public interface OrderRepository extends JpaRepository<Order, Integer>{
     //изменить этот запрос
     @Query("SELECT CASE WHEN :fieldName = 'forWhom' AND o.fromWhom IS NOT NULL THEN true ELSE false END FROM Order o WHERE o.id_order = :id")
     boolean isFieldPresent(@Param("id") int id, @Param("fieldName") String fieldName);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Order o SET o.filling = :filling WHERE o.id_order = :id")
+    void updateFilling(@Param("id") int id, @Param("filling") String filling);
 
 
     //переделать этот запрос

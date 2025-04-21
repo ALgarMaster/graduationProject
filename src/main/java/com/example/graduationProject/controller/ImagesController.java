@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,38 +36,81 @@ public class ImagesController {
 //    @Value("${file.upload-dir}")
     private String rootDirectory = "C:\\images";
     private final ImagesService imagesService;
+    private final S3StorageService s3StorageService;
 
 
     @GetMapping("/by-id/{id}")
-    public ResponseEntity<Resource> getImageById(@PathVariable int id) {
+    public ResponseEntity<byte[]> getImageByIdS3(@PathVariable int id) {
         try {
-
             Optional<Images> imageOpt = imagesService.getImageById(id);
             Images image = imageOpt.orElseThrow(() -> new IllegalArgumentException("Image not found"));
 
+            String fileName = image.getFileName(); // предполагается, что в поле fileName лежит имя файла в S3
+            InputStream s3InputStream = s3StorageService.getFile(fileName);
 
-            Path path = Paths.get(image.getFileSrc());
+            byte[] imageBytes = s3InputStream.readAllBytes(); // Java 9+
+            s3InputStream.close();
 
-
-            if (!Files.exists(path)) {
-                return ResponseEntity.notFound().build();
-            }
-
-
-            Resource resource = new UrlResource(path.toUri());
-
-
-            String contentType = Files.probeContentType(path);
+            // Пробуем определить тип контента (опционально — можно также сохранить тип в БД)
+            String contentType = Files.probeContentType(Paths.get(fileName));
             if (contentType == null) {
                 contentType = "application/octet-stream";
             }
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
-                    .body(resource);
+                    .body(imageBytes);
 
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
+            log.error("Ошибка при получении изображения из S3", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadImageToS3(@RequestParam("file") MultipartFile file,
+                                              @RequestParam("albumId") int albumId) {
+
+
+        try {
+            // Генерация уникального имени файла
+            String fileName = System.currentTimeMillis()+"";
+
+            String contentType = file.getContentType();
+
+            if (fileName.endsWith(".png")) {
+                contentType = "image/png";
+            } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                contentType = "image/jpeg";
+            } else if (fileName.endsWith(".webp")) {
+                contentType = "image/webp";
+            }
+
+            s3StorageService.uploadFile(
+                    fileName,
+                    file.getInputStream(),
+                    file.getSize()
+                    , contentType
+            );
+
+
+            // Генерация публичного URL
+            String fileUrl = s3StorageService.getFileUrl(fileName);
+
+            // Сохранение информации в БД
+            Images image = new Images(fileName, fileUrl, albumId);
+            imagesService.saveImage(image);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Image uploaded successfully: " + fileUrl);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error uploading file: " + e.getMessage());
         }
     }
 
@@ -137,6 +181,39 @@ public class ImagesController {
         return list;
     }
 
+    public List<byte[]> getImagesByAlbumIdS3(int albumId) {
+        List<Images> imagesList = imagesService.getImagesByIdAlbum(albumId);
+        if (imagesList.isEmpty()) {
+            log.warn("No images found in DB for albumId: {}", albumId);
+            throw new RuntimeException("The image list is empty");
+        }
+
+        List<byte[]> imageBytesList = new ArrayList<>();
+
+        for (Images image : imagesList) {
+            String key = image.getFileName();
+            if (key == null || key.isBlank()) {
+                log.warn("Image with id={} has empty S3 key", image.getIdImage());
+                continue;
+            }
+
+            try (InputStream inputStream = s3StorageService.getFile(key)) {
+                byte[] imageBytes = inputStream.readAllBytes();
+                imageBytesList.add(imageBytes);
+            } catch (Exception e) {
+                log.error("Failed to load image from S3 with key: {}", key, e);
+            }
+        }
+
+        if (imageBytesList.isEmpty()) {
+            log.error("No images could be loaded from S3 for albumId: {}", albumId);
+            throw new RuntimeException("The image list is empty");
+        }
+
+        return imageBytesList;
+    }
+
+
     public List<Integer> getImagesFileNameByAlbumIdWithUrl(int id){
         List<Images> imagesList = new ArrayList<>(imagesService.getImagesByIdAlbum(id));
         List<Integer> data = new ArrayList<>();
@@ -145,5 +222,8 @@ public class ImagesController {
 
         return data;
     }
+
+
+
 
 }

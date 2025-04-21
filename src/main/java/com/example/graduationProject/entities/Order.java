@@ -19,9 +19,6 @@ public class Order {
     @Column(name ="id_order")
     private int id_order;
 
-    @Column(name ="title", nullable = true)
-    private String title;
-
     @Enumerated(EnumType.STRING)
     @Column(name ="type_", nullable = true)
     private TYPEORDER type;
@@ -55,6 +52,9 @@ public class Order {
     @JoinColumn(name = "id_user", referencedColumnName = "id_user", insertable = false, updatable = false)
     private Users user;
 
+    @Column(name = "filling", columnDefinition = "VARCHAR(255)", nullable = true)
+    private String filling;
+
 
 
     public Order(){}
@@ -67,7 +67,6 @@ public class Order {
     public Order(String title, TYPEORDER type, SIZE size, FORWHOM fromWhom, SUBJECT subject, COLORCOMBO color, int idUser,STATETURNBOT stateOrder) {
         this.color = color;
         this.idUser = idUser;
-        this.title = title;
         this.size = size;
         this.fromWhom = fromWhom;
         this.subject = subject;
@@ -75,13 +74,6 @@ public class Order {
         this.stateOrder = stateOrder;
     }
 
-    public void setTitle(String title){
-        this.title = title;
-    }
-
-    public String getTitle(){
-        return title;
-    }
 
 
     public TYPEORDER getType() {
@@ -116,6 +108,14 @@ public class Order {
         this.subject = subject;
     }
 
+    public String getFilling() {
+        return filling;
+    }
+
+    public void setFilling(String filling) {
+        this.filling = filling;
+    }
+
     public COLORCOMBO getColor() {
         return color;
     }
@@ -144,6 +144,9 @@ public class Order {
         
         return message.toString();
     }
+
+
+
 
 
     private String getReadableType(TYPEORDER type) {

@@ -1,12 +1,14 @@
 package com.example.graduationProject.service;
 
+import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.enumeration.STATEMESSAGE;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
 
@@ -55,6 +57,38 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         addRowsInLine(backButton,chatButton);
         inlineKeyboard.setKeyboard(rowsInLine);
         return inlineKeyboard;
+    }
+
+    public InlineKeyboardMarkup webForm(InlineKeyboardMarkup inlineKeyboard, Order order, Long telegramUserId, String webAppBaseUrl) {
+        try {
+            Map<String, Object> orderData = new HashMap<>();
+            orderData.put("type", order.getType());
+            orderData.put("size", order.getSize());
+            orderData.put("from_whom", order.getFromWhom());
+            orderData.put("subject", order.getSubject());
+            orderData.put("color", order.getColor());
+            orderData.put("order_id", order.getId_order());
+
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(orderData);
+
+            String encoded = Base64.getUrlEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+            String fullUrl = webAppBaseUrl + "?data=" + encoded;
+
+            InlineKeyboardButton chatButton = new InlineKeyboardButton();
+            chatButton.setText("Выберите наполнение подарка");
+            chatButton.setUrl(fullUrl);
+
+            InlineKeyboardButton backButton = createInlineKeyboardButtonSetTextAndSetCallBack("Назад к заказу", "backToOrder");
+
+            addRowsInLine(backButton, chatButton);
+            inlineKeyboard.setKeyboard(rowsInLine);
+            return inlineKeyboard;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return inlineKeyboard;
+        }
     }
 
     public InlineKeyboardMarkup addLinkWithButtons(InlineKeyboardMarkup inlineKeyboard, String backUrl) {

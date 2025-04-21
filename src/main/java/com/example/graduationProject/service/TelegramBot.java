@@ -5,9 +5,11 @@ import com.example.graduationProject.controller.ImagesController;
 import com.example.graduationProject.controller.OrderController;
 import com.example.graduationProject.controller.StageController;
 import com.example.graduationProject.controller.UsersController;
+import com.example.graduationProject.entities.Album;
 import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Stage;
 import com.example.graduationProject.enumeration.*;
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +50,11 @@ public class TelegramBot extends TelegramLongPollingBot{
     private StageController stageController;
     private OrderController orderController;
     private UsersController usersController;
+    private AlbumService albumService;
 
     private DBConfig dbConfig;
 
-    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController, StageController stageController, OrderController orderController, UsersController usersController) throws SQLException {
+    public TelegramBot(BotConfiguration configuration, DBConfig dbConfig, ImagesController imagesController, StageController stageController, OrderController orderController, UsersController usersController, AlbumService albumService) throws SQLException {
         this.botConfiguration = configuration;
         this.dbConfig = dbConfig;
 //        this.connection = dbConfig.getConnection(); // Получаем подключение через DBConfig
@@ -59,6 +62,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.stageController = stageController;
         this.orderController = orderController;
         this.usersController = usersController;
+        this.albumService = albumService;
     }
 
     @Override
@@ -78,10 +82,9 @@ public class TelegramBot extends TelegramLongPollingBot{
                     idUsers = usersController.getOrCreateUserByChatId(chatID, update.getMessage().getFrom().getUserName());
                     try {
                         startCommandReceived(chatID, update.getMessage().getChat().getFirstName());
-//                        Order order = new Order();
-//                        order.setTitle(System.currentTimeMillis()+"");
-//                        idOrder = orderController.saveUpdateOrderReturnOrder(order).getId_order();
-//                        log.info("Id create order: " + idOrder);
+                        Order order = new Order();
+                        idOrder = orderController.saveUpdateOrderReturnOrder(order).getId_order();
+                        log.info("Id create order: " + idOrder);
 
 
 
@@ -110,7 +113,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
                             // Проверяем, что заказ не является null
                             if (probeOrder != null) {
-                                log.info("Last order title for user id " + idUsers + ": " + probeOrder.getTitle());
+                                log.info("Last order title for user id " + idUsers + ": " + probeOrder.getStateOrder());
                             } else {
                                 log.warn("No orders found for user with id: " + idUsers);
                             }
@@ -136,7 +139,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     // сделать сообщение что выбирите изображение
                     //подождать пока его загрузять
                     // валидация изображения
-                    // загрузка изображения  из массива байт и сохранение его в определенном месте на диске, с генерируемым именем
+                    // загрузка изображения из массива байт и сохранение его в определенном месте на диске, с генерируемым именем
                     //сообщнеи с выбором альбома
                     //запрос на список существующих альбомов
                     //сообщение с результатом
@@ -152,16 +155,34 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file = new CustomMultipartFile(imagePath);
 
                     ResponseEntity<String> response = null;
-                    try {
-                        response = imagesController.uploadImage(file, 12);
-                        log.info("Added writ"+response.getBody());
-                    } catch (IOException e) {
-                        log.error("Error main bot in /probeImage"+e.getMessage());
-                        throw new RuntimeException(e);
-                    }
+                    response = imagesController.uploadImageToS3(file, 65);
+                    log.info("Added writ"+response.getBody());
                     break;
 
+                case "/probeGetImageS3":
 
+                    SendPhoto sendPhoto = new SendPhoto();
+                    sendPhoto.setChatId(chatID);
+
+                    byte[] image = imagesController.getImageByIdS3(38).getBody();
+                    // Используем ByteArrayInputStream вместо File
+                    log.info(image.toString());
+                    InputStream inputStream = new ByteArrayInputStream(image);
+                    InputFile inputFile = new InputFile(inputStream, "image.png");
+                    sendPhoto.setPhoto(inputFile);
+                    sendPhoto.setParseMode("Markdown");
+                    try {
+                        execute(sendPhoto);
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    List<byte[]> images = imagesController.getImagesByAlbumIdS3(65);
+                    log.info(images.toString());
+
+                    sendMultipleImagesS3(images, chatID, "jef");
+
+                    break;
                 case "/":
                     break;
 //                case "/probeQueryImagesByAlbumId0":
@@ -1072,6 +1093,125 @@ public class TelegramBot extends TelegramLongPollingBot{
             log.error("Error sending inline keyboard: " + e.getMessage(), e);
         }
     }
+
+    //S3 version
+    public void handleAlbumImagesS3(int probeAlbumId, long chatID, String title) {//, STATEMESSAGE statemessage
+        try {
+            // Получаем список изображений для альбома из S3
+            List<byte[]> imagesByteList = imagesController.getImagesByAlbumIdS3(probeAlbumId);
+
+            if (imagesByteList.isEmpty()) {
+                throw new RuntimeException("The image list is empty from S3 (byte[])");
+            }
+
+            for (byte[] imageBytes : imagesByteList) {
+                log.info("Image byte array length: " + imageBytes.length); // Логируем длину каждого изображения
+            }
+
+            // Если в альбоме только одно изображение
+            if (imagesByteList.size() == 1) {
+                sendSingleImageS3(imagesByteList.get(0), chatID, title);//, statemessage
+            }
+            // Если в альбоме несколько изображений
+            else if (!imagesByteList.isEmpty()) {
+                sendMultipleImagesS3(imagesByteList, chatID, title);//, statemessage
+            }
+
+            log.info("Album images from S3 (byte[]) handled successfully for albumId: " + probeAlbumId);
+        } catch (Exception e) {
+            log.error("Error in handleAlbumImagesWithBytes: " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendSingleImageS3(byte[] imageBytes, long chatID, String title) {//, STATEMESSAGE statemessage
+        try {
+            CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+
+            SendPhoto sendPhoto = new SendPhoto();
+            sendPhoto.setChatId(chatID);
+
+            // Преобразуем байтовый массив в InputFile
+            InputStream inputStream = new ByteArrayInputStream(imageBytes);
+            InputFile inputFile = new InputFile(inputStream, "image.png"); // Указываем имя файла, например "image.jpg"
+
+            sendPhoto.setPhoto(inputFile); // Загружаем через InputFile с байтовым массивом
+            sendPhoto.setCaption(title);
+            sendPhoto.setParseMode("Markdown");
+
+            // Подставляем клавиатуру в зависимости от состояния
+//            sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard, statemessage));
+
+            Message sentMessage = execute(sendPhoto);
+            saveMessageIds(chatID, sentMessage.getMessageId());
+            log.info("Single image from S3 sent successfully.");
+        } catch (Exception e) {
+            log.error("Error sending single image from S3: " + e.getMessage(), e);
+        }
+    }
+
+
+    private void sendMultipleImagesS3(List<byte[]> imagesByteList, long chatID, String title) {//, STATEMESSAGE statemessage
+        try {
+            if (imagesByteList.isEmpty()) {
+                log.error("No images to send from S3.");
+                return;
+            }
+
+            SendMediaGroup sendMediaGroup = new SendMediaGroup();
+            sendMediaGroup.setChatId(chatID);
+
+            List<InputMedia> mediaList = new ArrayList<>();
+
+            // Обрабатываем изображения из S3 (в виде байтовых массивов)
+            for (int i = 0; i < imagesByteList.size(); i++) {
+                byte[] currentImageBytes = imagesByteList.get(i);
+                InputMediaPhoto photo = new InputMediaPhoto();
+
+                // Преобразуем байтовый массив в InputStream
+                InputStream inputStream = new ByteArrayInputStream(currentImageBytes);
+//                InputFile inputFile = new InputFile(inputStream, "image_s3_" + i + ".png");  // Указываем имя файла
+
+                photo.setMedia(inputStream, "image_s3_" + i);  // Передаем InputFile и уникальное имя для каждого изображения
+
+                // Добавляем подпись только к первому изображению
+                if (i == 0) {
+                    photo.setCaption(title);
+                    photo.setParseMode("Markdown");
+                }
+
+                mediaList.add(photo);
+            }
+
+            if (!mediaList.isEmpty()) {
+                sendMediaGroup.setMedias(mediaList);
+
+                // Отправляем альбом и получаем список сообщений
+                List<Message> sentMessages = execute(sendMediaGroup);
+
+                log.info("Album from S3 sent successfully.");
+
+                // Сохраняем ID всех сообщений из медиа-группы
+                for (Message message : sentMessages) {
+                    saveMessageIds(chatID, message.getMessageId());
+                }
+
+            } else {
+                log.error("No valid images to send from S3.");
+                return;
+            }
+
+            // Отправляем клавиатуру отдельным сообщением
+//            sendInlineKeyboard(chatID, statemessage);
+
+        } catch (Exception e) {
+            log.error("Error sending multiple images from S3: " + e.getMessage(), e);
+        }
+    }
+
+
+
+
 
 
     private void startCommandReceived(long chatID, String name){
