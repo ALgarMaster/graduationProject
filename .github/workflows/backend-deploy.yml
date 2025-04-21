@@ -3,8 +3,8 @@ name: Deploy Backend to Docker
 on:
   push:
     paths:
-      - 'graduationProject/**'  # Путь к бэкенду
-      - '.github/workflows/backend-deploy.yml'
+      - 'graduationProject/**'  # Следим за изменениями в каталоге бэкенда
+      - '.github/workflows/backend-deploy.yml'  # Следим за изменениями в конфигурации GitHub Actions
     branches:
       - main  # Деплой при пуше в ветку main
 
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # 2. Настраиваем Docker Buildx
+      # 2. Настроим Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -30,30 +30,35 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      # 4. Собираем Docker-образ бэкенда
-      - name: Build Backend Docker Image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest ./graduationProject
-
-      # 5. Логинимся в Docker Hub
-      - name: Log in to Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      # 6. Пушим образ на Docker Hub
-      - name: Push Backend Image to Docker Hub
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest
-
-      # 7. SSH на сервер и перезапускаем бэкенд через Docker Compose
-      - name: SSH into Server and Restart Backend
+      # 4. SSH на сервер и выполняем действия для бэкенда
+      - name: SSH into Server and Deploy Backend
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # 4.1 Переходим в папку с бэкендом
+            cd ~/vintageBot/graduationProject
+            
+            # 4.2 Обновляем код с репозитория
+            git pull origin main
+            
+            # 4.3 Собираем JAR-файл
+            ./mvnw clean package -DskipTests
+            
+            # 4.4 Собираем новый Docker-образ
+            docker build -t stassrc/diploma_backend:latest .
+
+            # 4.5 Логинимся в Docker Hub
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+            # 4.6 Пушим образ на Docker Hub
+            docker push stassrc/diploma_backend:latest
+
+            # 4.7 Переходим в каталог с Docker Compose
             cd ~/vintageBot/compuseDiplom
-            git pull origin main  # Обновляем репозиторий
-            docker compose pull backend  # Загружаем новые образы
-            docker compose up -d backend  # Перезапускаем контейнер бэкенда
+
+            # 4.8 Подтягиваем новый образ и перезапускаем контейнер
+            docker compose pull backend
+            docker compose up -d backend
