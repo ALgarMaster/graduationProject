@@ -3,26 +3,25 @@ name: Deploy Backend to Docker
 on:
   push:
     paths:
-      - 'graduationProject/**'
+      - 'graduationProject/**'  # Путь к бэкенду
       - '.github/workflows/backend-deploy.yml'
     branches:
-      - main
+      - main  # Деплой при пуше в ветку main
 
 jobs:
   deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Клонируем репозиторий
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: List files in repo (debugging step)
-        run: |
-          ls -R
-
+      # 2. Настраиваем Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      # 3. Кешируем Docker слои
       - name: Cache Docker layers
         uses: actions/cache@v3
         with:
@@ -31,19 +30,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      # 4. Собираем Docker-образ бэкенда
       - name: Build Backend Docker Image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest ./graduationProject
 
+      # 5. Логинимся в Docker Hub
       - name: Log in to Docker Hub
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+      # 6. Пушим образ на Docker Hub
       - name: Push Backend Image to Docker Hub
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest
 
-      - name: SSH into Server and Restart Backend via docker-compose
+      # 7. SSH на сервер и перезапускаем бэкенд через Docker Compose
+      - name: SSH into Server and Restart Backend
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -51,6 +54,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ~/vintageBot/compuseDiplom
-            git pull origin main
-            docker compose pull backend
-            docker compose up -d backend
+            git pull origin main  # Обновляем репозиторий
+            docker compose pull backend  # Загружаем новые образы
+            docker compose up -d backend  # Перезапускаем контейнер бэкенда
