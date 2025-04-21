@@ -3,10 +3,10 @@ name: Deploy Backend to Docker
 on:
   push:
     paths:
-      - 'graduationProject/**'  # Следим за изменениями в каталоге бэкенда
-      - '.github/workflows/backend-deploy.yml'  # Следим за изменениями в конфигурации GitHub Actions
+      - 'graduationProject/**'
+      - '.github/workflows/backend-deploy.yml'
     branches:
-      - main  # Деплой при пуше в ветку main
+      - main
 
 jobs:
   deploy-backend:
@@ -40,25 +40,28 @@ jobs:
           script: |
             # 4.1 Переходим в папку с бэкендом
             cd ~/vintageBot/graduationProject
-            
+
             # 4.2 Обновляем код с репозитория
             git pull origin main
-            
-            # 4.3 Собираем JAR-файл
+
+            # 4.3 Даем права на выполнение для mvnw
+            chmod +x ./mvnw
+
+            # 4.4 Собираем JAR-файл
             ./mvnw clean package -DskipTests
-            
-            # 4.4 Собираем новый Docker-образ
+
+            # 4.5 Собираем новый Docker-образ
             docker build -t stassrc/diploma_backend:latest .
 
-            # 4.5 Логинимся в Docker Hub
+            # 4.6 Логинимся в Docker Hub
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-            # 4.6 Пушим образ на Docker Hub
+            # 4.7 Пушим образ на Docker Hub
             docker push stassrc/diploma_backend:latest
 
-            # 4.7 Переходим в каталог с Docker Compose
+            # 4.8 Переходим в каталог с Docker Compose
             cd ~/vintageBot/compuseDiplom
 
-            # 4.8 Подтягиваем новый образ и перезапускаем контейнер
+            # 4.9 Подтягиваем новый образ и перезапускаем контейнер
             docker compose pull backend
             docker compose up -d backend
