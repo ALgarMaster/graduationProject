@@ -14,9 +14,9 @@ import java.util.Set;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_product", nullable = false, unique = true)
-    private Long idProduct;
+    private int idProduct;
 
     @Column(name = "id_album", nullable = false)
     private int idAlbum;
@@ -70,6 +70,82 @@ public class Product {
         this.header = header;
         this.ingredient = ingredient;
         this.unit = false;
+    }
+
+    public boolean isUnit() {
+        return unit;
+    }
+
+    public void setUnit(boolean unit) {
+        this.unit = unit;
+    }
+
+    public String getIngredient() {
+        return ingredient;
+    }
+
+    public void setIngredient(String ingredient) {
+        this.ingredient = ingredient;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public SubCategory getSubcategory() {
+        return subcategory;
+    }
+
+    public void setSubcategory(SubCategory subcategory) {
+        this.subcategory = subcategory;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getIdAlbum() {
+        return idAlbum;
+    }
+
+    public void setIdAlbum(int idAlbum) {
+        this.idAlbum = idAlbum;
+    }
+
+    public int getIdProduct() {
+        return idProduct;
     }
 }
 

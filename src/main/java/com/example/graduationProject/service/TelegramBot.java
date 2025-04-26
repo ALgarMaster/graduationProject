@@ -135,29 +135,97 @@ public class TelegramBot extends TelegramLongPollingBot{
                         log.error("Error main bot" + e.getMessage());
                     }
                     break;
-                case "/probeImage":
-                    // сделать сообщение что выбирите изображение
-                    //подождать пока его загрузять
-                    // валидация изображения
-                    // загрузка изображения из массива байт и сохранение его в определенном месте на диске, с генерируемым именем
-                    //сообщнеи с выбором альбома
-                    //запрос на список существующих альбомов
-                    //сообщение с результатом
-                    //ожидание сообщения с номером альбома
-                    //валидация ответа
-                    //запись изображения в базу
-                    // валидация записи
-                    //конечный ответ о результате
-
-                    String imagePath = "C:\\Users\\Stanislav\\Downloads\\13558895.png";
-
-                    // Create the CustomMultipartFile
-                    CustomMultipartFile file = new CustomMultipartFile(imagePath);
-
-                    ResponseEntity<String> response = null;
-                    response = imagesController.uploadImageToS3(file, 65);
-                    log.info("Added writ"+response.getBody());
-                    break;
+//                case "/downloadImageForS3":
+//                    // сделать сообщение что выбирите изображение
+//                    //подождать пока его загрузять
+//                    // валидация изображения
+//                    // загрузка изображения из массива байт и сохранение его в определенном месте на диске, с генерируемым именем
+//                    //сообщнеи с выбором альбома
+//                    //запрос на список существующих альбомов
+//                    //сообщение с результатом
+//                    //ожидание сообщения с номером альбома
+//                    //валидация ответа
+//                    //запись изображения в базу
+//                    // валидация записи
+//                    //конечный ответ о результате
+//
+//                    // Загрузка первого файла в альбом с ID 65
+//                    String imagePath1 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\basket.png";
+//                    CustomMultipartFile file1 = new CustomMultipartFile(imagePath1);
+//                    imagesController.uploadImageToS3(file1, 6);
+//
+//// Загрузка второго файла в альбом с ID 66
+//                    String imagePath2 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Bouquet.png";
+//                    CustomMultipartFile file2 = new CustomMultipartFile(imagePath2);
+//                    imagesController.uploadImageToS3(file2, 8);
+//
+//// Загрузка третьего файла в альбом с ID 67
+//                    String imagePath3 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Bouquet_of_bags.png";
+//                    CustomMultipartFile file3 = new CustomMultipartFile(imagePath3);
+//                    imagesController.uploadImageToS3(file3, 10);
+//
+//// Загрузка четвертого файла в альбом с ID 65
+//                    String imagePath4 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\box.png";
+//                    CustomMultipartFile file4 = new CustomMultipartFile(imagePath4);
+//                    imagesController.uploadImageToS3(file4, 9);
+//
+//// Загрузка пятого файла в альбом с ID 66
+//                    String imagePath5 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Color_range_of_the_order.png";
+//                    CustomMultipartFile file5 = new CustomMultipartFile(imagePath5);
+//                    imagesController.uploadImageToS3(file5, 5);
+//
+//// Загрузка седьмого файла в альбом с ID 65
+//                    String imagePath7 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Holidays.png";
+//                    CustomMultipartFile file7 = new CustomMultipartFile(imagePath7);
+//                    imagesController.uploadImageToS3(file7, 4);
+//
+//// Загрузка восьмого файла в альбом с ID 66
+//                    String imagePath8 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Holidays2.png";
+//                    CustomMultipartFile file8 = new CustomMultipartFile(imagePath8);
+//                    imagesController.uploadImageToS3(file8, 4);
+//
+//// Загрузка девятого файла в альбом с ID 67
+//                    String imagePath9 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Holidays3.png";
+//                    CustomMultipartFile file9 = new CustomMultipartFile(imagePath9);
+//                    imagesController.uploadImageToS3(file9, 4);
+//
+//// Загрузка десятого файла в альбом с ID 65
+//                    String imagePath10 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Pallets.png";
+//                    CustomMultipartFile file10 = new CustomMultipartFile(imagePath10);
+//                    imagesController.uploadImageToS3(file10, 7);
+//
+//// Загрузка одиннадцатого файла в альбом с ID 66
+//                    String imagePath11 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Round_bouquet.png";
+//                    CustomMultipartFile file11 = new CustomMultipartFile(imagePath11);
+//                    imagesController.uploadImageToS3(file11, 10);
+//
+//// Загрузка двенадцатого файла в альбом с ID 67
+//                    String imagePath12 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Round_box.png";
+//                    CustomMultipartFile file12 = new CustomMultipartFile(imagePath12);
+//                    imagesController.uploadImageToS3(file12, 11);
+//
+//
+//                    // Загрузка четырнадцатого файла в альбом с ID 66
+//                    String imagePath28 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\For_whom.png";
+//                    CustomMultipartFile file28 = new CustomMultipartFile(imagePath28);
+//                    imagesController.uploadImageToS3(file28, 3);
+//
+//// Загрузка пятнадцатого файла в альбом с ID 67
+//                    String imagePath15 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\Square_box.png";
+//                    CustomMultipartFile file15 = new CustomMultipartFile(imagePath15);
+//                    imagesController.uploadImageToS3(file15, 11);
+//
+//// Загрузка шестнадцатого файла в альбом с ID 65
+//                    String imagePath16 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\type.png";
+//                    CustomMultipartFile file16 = new CustomMultipartFile(imagePath16);
+//                    imagesController.uploadImageToS3(file16, 1);
+//
+//                    // Загрузка шестнадцатого файла в альбом с ID 65
+//                    String imagePath17 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\type.png";
+//                    CustomMultipartFile file17 = new CustomMultipartFile(imagePath17);
+//                    imagesController.uploadImageToS3(file17, 0);
+//
+//                    break;
 
                 case "/probeGetImageS3":
 
@@ -180,7 +248,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     List<byte[]> images = imagesController.getImagesByAlbumIdS3(65);
                     log.info(images.toString());
 
-                    sendMultipleImagesS3(images, chatID, "jef");
+                    sendMultipleImagesS3(images, chatID, "jef", SIZE);
 
                     break;
                 case "/":
@@ -231,11 +299,6 @@ public class TelegramBot extends TelegramLongPollingBot{
 //                    }
 //                    break;
 
-
-                case "/testConnectionToDB":
-                    String responseMessage = testDatabaseConnection();
-                    sendMessage(chatID, responseMessage);
-                    break;
 
                 default: sendMessage(chatID, "Ooooops, sorry, command was not recognized(((");
             }
@@ -964,118 +1027,118 @@ public class TelegramBot extends TelegramLongPollingBot{
 //    }
 
     //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
-    public void handleAlbumImages(int probeAlbumId, long chatID, String title, STATEMESSAGE statemessage) {
-        try {
-            // Получаем список изображений для альбома
-            List<File> imagesFileList = imagesController.getImagesByAlbumId(probeAlbumId);
-            for (File imageFile : imagesFileList) {
-                log.info("Image path: " + imageFile.getAbsolutePath()); // Логируем полный путь к каждому изображению
-            }
-
-            // Если в альбоме только одно изображение
-            if (imagesFileList.size() == 1) {
-                sendSingleImage(imagesFileList.get(0),  chatID, title, statemessage);
-            }
-            // Если в альбоме несколько изображений
-            else if (!imagesFileList.isEmpty()) {
-                sendMultipleImages(imagesFileList, chatID, title, statemessage);
-            }
-
-            log.info("Album images handled successfully for albumId: " + probeAlbumId);
-        } catch (Exception e) {
-            log.error("Error in handleAlbumImages: " + e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    // сделать так чтобы можно было менять подпись картинки
-    // Функция для отправки одного изображения
-
-    //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
-    private void sendSingleImage(File imageFile, long chatID, String title, STATEMESSAGE statemessage) {
-        try {
-            CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
-
-
-            SendPhoto sendPhoto = new SendPhoto();
-            sendPhoto.setChatId(chatID);
-            sendPhoto.setPhoto(new InputFile(imageFile)); // Передаем изображение
-            sendPhoto.setCaption(title);
-            sendPhoto.setParseMode("Markdown");
-
-
-            // Отправляем одно изображение
-            //сделать свитч с стейтмами с клавиатурами
-            sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard,statemessage));
-
-            Message sentMessage = execute(sendPhoto);
-            saveMessageIds(chatID, sentMessage.getMessageId());
-            log.info("Single image sent successfully.");
-        } catch (Exception e) {
-            log.error("Error sending single image: " + e.getMessage(), e);
-        }
-    }
-
-    // сделать, так чтобы можно было менять подпись альбома
-    // Функция для отправки нескольких изображений
-    //Сделать, так чтобы по множеству стейтмасседж подставлялась нужная клавиатура
-    // Функция для отправки нескольких изображений с возможностью изменить подпись альбома
-    private void sendMultipleImages(List<File> imagesFileList, long chatID, String title, STATEMESSAGE statemessage) {
-        try {
-            if (imagesFileList.isEmpty()) {
-                log.error("No images to send.");
-                return;
-            }
-
-            SendMediaGroup sendMediaGroup = new SendMediaGroup();
-            sendMediaGroup.setChatId(chatID);
-
-            List<InputMedia> mediaList = new ArrayList<>();
-
-            for (int i = 0; i < imagesFileList.size(); i++) {
-                File currentImage = imagesFileList.get(i);
-                if (currentImage.exists()) {
-                    InputMediaPhoto photo = new InputMediaPhoto();
-                    photo.setMedia(currentImage, "image_" + i);
-
-                    // Добавляем подпись только к первому изображению
-                    if (i == 0) {
-                        photo.setCaption(title);
-                        photo.setParseMode("Markdown");
-                    }
-
-                    mediaList.add(photo);
-                } else {
-                    log.error("Image file does not exist: " + currentImage.getAbsolutePath());
-                }
-            }
-
-            if (!mediaList.isEmpty()) {
-                sendMediaGroup.setMedias(mediaList);
-
-                // Отправляем альбом и получаем список сообщений
-                List<Message> sentMessages = execute(sendMediaGroup);
-
-                log.info("Album sent successfully.");
-
-                // Сохраняем ID всех сообщений из медиа-группы
-                for (Message message : sentMessages) {
-                    saveMessageIds(chatID, message.getMessageId());
-                }
-
-            } else {
-                log.error("No valid images to send.");
-                return;
-            }
-
-            // Отправляем клавиатуру отдельным сообщением
-            //сделать свитч с стейтмами с клавиатурами
-            sendInlineKeyboard(chatID, statemessage);
-
-        } catch (Exception e) {
-            log.error("Error sending multiple images: " + e.getMessage(), e);
-        }
-    }
+//    public void handleAlbumImages(int probeAlbumId, long chatID, String title, STATEMESSAGE statemessage) {
+//        try {
+//            // Получаем список изображений для альбома
+//            List<File> imagesFileList = imagesController.getImagesByAlbumId(probeAlbumId);
+//            for (File imageFile : imagesFileList) {
+//                log.info("Image path: " + imageFile.getAbsolutePath()); // Логируем полный путь к каждому изображению
+//            }
+//
+//            // Если в альбоме только одно изображение
+//            if (imagesFileList.size() == 1) {
+//                sendSingleImage(imagesFileList.get(0),  chatID, title, statemessage);
+//            }
+//            // Если в альбоме несколько изображений
+//            else if (!imagesFileList.isEmpty()) {
+//                sendMultipleImages(imagesFileList, chatID, title, statemessage);
+//            }
+//
+//            log.info("Album images handled successfully for albumId: " + probeAlbumId);
+//        } catch (Exception e) {
+//            log.error("Error in handleAlbumImages: " + e.getMessage(), e);
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    // сделать так чтобы можно было менять подпись картинки
+//    // Функция для отправки одного изображения
+//
+//    //Сделать так, чтобы по множеству стейтмасседж подставлялась нужная клавиатура
+//    private void sendSingleImage(File imageFile, long chatID, String title, STATEMESSAGE statemessage) {
+//        try {
+//            CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+//
+//
+//            SendPhoto sendPhoto = new SendPhoto();
+//            sendPhoto.setChatId(chatID);
+//            sendPhoto.setPhoto(new InputFile(imageFile)); // Передаем изображение
+//            sendPhoto.setCaption(title);
+//            sendPhoto.setParseMode("Markdown");
+//
+//
+//            // Отправляем одно изображение
+//            //сделать свитч с стейтмами с клавиатурами
+//            sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard,statemessage));
+//
+//            Message sentMessage = execute(sendPhoto);
+//            saveMessageIds(chatID, sentMessage.getMessageId());
+//            log.info("Single image sent successfully.");
+//        } catch (Exception e) {
+//            log.error("Error sending single image: " + e.getMessage(), e);
+//        }
+//    }
+//
+//    // сделать, так чтобы можно было менять подпись альбома
+//    // Функция для отправки нескольких изображений
+//    //Сделать, так чтобы по множеству стейтмасседж подставлялась нужная клавиатура
+//    // Функция для отправки нескольких изображений с возможностью изменить подпись альбома
+//    private void sendMultipleImages(List<File> imagesFileList, long chatID, String title, STATEMESSAGE statemessage) {
+//        try {
+//            if (imagesFileList.isEmpty()) {
+//                log.error("No images to send.");
+//                return;
+//            }
+//
+//            SendMediaGroup sendMediaGroup = new SendMediaGroup();
+//            sendMediaGroup.setChatId(chatID);
+//
+//            List<InputMedia> mediaList = new ArrayList<>();
+//
+//            for (int i = 0; i < imagesFileList.size(); i++) {
+//                File currentImage = imagesFileList.get(i);
+//                if (currentImage.exists()) {
+//                    InputMediaPhoto photo = new InputMediaPhoto();
+//                    photo.setMedia(currentImage, "image_" + i);
+//
+//                    // Добавляем подпись только к первому изображению
+//                    if (i == 0) {
+//                        photo.setCaption(title);
+//                        photo.setParseMode("Markdown");
+//                    }
+//
+//                    mediaList.add(photo);
+//                } else {
+//                    log.error("Image file does not exist: " + currentImage.getAbsolutePath());
+//                }
+//            }
+//
+//            if (!mediaList.isEmpty()) {
+//                sendMediaGroup.setMedias(mediaList);
+//
+//                // Отправляем альбом и получаем список сообщений
+//                List<Message> sentMessages = execute(sendMediaGroup);
+//
+//                log.info("Album sent successfully.");
+//
+//                // Сохраняем ID всех сообщений из медиа-группы
+//                for (Message message : sentMessages) {
+//                    saveMessageIds(chatID, message.getMessageId());
+//                }
+//
+//            } else {
+//                log.error("No valid images to send.");
+//                return;
+//            }
+//
+//            // Отправляем клавиатуру отдельным сообщением
+//            //сделать свитч с стейтмами с клавиатурами
+//            sendInlineKeyboard(chatID, statemessage);
+//
+//        } catch (Exception e) {
+//            log.error("Error sending multiple images: " + e.getMessage(), e);
+//        }
+//    }
 
     // Отдельный метод для отправки клавиатуры
     private void sendInlineKeyboard(long chatID, STATEMESSAGE statemessage) {
@@ -1095,7 +1158,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
     //S3 version
-    public void handleAlbumImagesS3(int probeAlbumId, long chatID, String title) {//, STATEMESSAGE statemessage
+    public void handleAlbumImages(int probeAlbumId, long chatID, String title, STATEMESSAGE statemessage) {//
         try {
             // Получаем список изображений для альбома из S3
             List<byte[]> imagesByteList = imagesController.getImagesByAlbumIdS3(probeAlbumId);
@@ -1110,11 +1173,11 @@ public class TelegramBot extends TelegramLongPollingBot{
 
             // Если в альбоме только одно изображение
             if (imagesByteList.size() == 1) {
-                sendSingleImageS3(imagesByteList.get(0), chatID, title);//, statemessage
+                sendSingleImageS3(imagesByteList.get(0), chatID, title, statemessage);//, statemessage
             }
             // Если в альбоме несколько изображений
             else if (!imagesByteList.isEmpty()) {
-                sendMultipleImagesS3(imagesByteList, chatID, title);//, statemessage
+                sendMultipleImagesS3(imagesByteList, chatID, title, statemessage);//, statemessage
             }
 
             log.info("Album images from S3 (byte[]) handled successfully for albumId: " + probeAlbumId);
@@ -1124,7 +1187,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    private void sendSingleImageS3(byte[] imageBytes, long chatID, String title) {//, STATEMESSAGE statemessage
+    private void sendSingleImageS3(byte[] imageBytes, long chatID, String title, STATEMESSAGE statemessage) {//
         try {
             CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
@@ -1140,7 +1203,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             sendPhoto.setParseMode("Markdown");
 
             // Подставляем клавиатуру в зависимости от состояния
-//            sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard, statemessage));
+            sendPhoto.setReplyMarkup(inlineKeyboard.addInlineKeyboardBySTATEMASSEGE(inlineKeyboard, statemessage));
 
             Message sentMessage = execute(sendPhoto);
             saveMessageIds(chatID, sentMessage.getMessageId());
@@ -1151,7 +1214,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
 
-    private void sendMultipleImagesS3(List<byte[]> imagesByteList, long chatID, String title) {//, STATEMESSAGE statemessage
+    private void sendMultipleImagesS3(List<byte[]> imagesByteList, long chatID, String title, STATEMESSAGE statemessage) {//
         try {
             if (imagesByteList.isEmpty()) {
                 log.error("No images to send from S3.");
@@ -1202,7 +1265,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             }
 
             // Отправляем клавиатуру отдельным сообщением
-//            sendInlineKeyboard(chatID, statemessage);
+            sendInlineKeyboard(chatID, statemessage);
 
         } catch (Exception e) {
             log.error("Error sending multiple images from S3: " + e.getMessage(), e);

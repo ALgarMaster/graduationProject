@@ -14,7 +14,7 @@ import lombok.Data;
 public class Stage {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name ="id_stage")
+    @Column(name ="id_stage", nullable = false, unique = true)
     private int idStage;
 
     @Column(name ="title")

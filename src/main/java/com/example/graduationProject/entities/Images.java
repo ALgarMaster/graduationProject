@@ -13,8 +13,8 @@ import lombok.Data;
 public class Images {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="id_image")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name ="id_image", nullable = false, unique = true)
     private int idImage;
 
     @Column(name ="file_name")
@@ -23,7 +23,7 @@ public class Images {
     @Column(name ="file_src")
     private String fileSrc;
 
-    @Column(name ="id_album")
+    @Column(name ="id_album", nullable = false)
     private int idAlbum;
 
     public Images() {

@@ -15,13 +15,14 @@ public class S3Config {
     public static S3Client createClient() {
 
         AwsBasicCredentials credentials = AwsBasicCredentials.create(
-                "$ACCESS_KEY",
-                "$SECRET_KEY"
+                System.getenv("ACCESS_KEY"),
+
+                System.getenv("SECRET_KEY")
         );
 
         return S3Client.builder()
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .region(Region.of("$REG")) // Например: "ru-central" или "us-east-1"
+                .region(Region.of( System.getenv("REG"))) // Например: "ru-central" или "us-east-1"
                 .endpointOverride(URI.create("https://s3.yandexcloud.net")) // Например: "https://s3.twcstorage.ru"
                 .serviceConfiguration(
                         S3Configuration.builder()

@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "album")
 public class Album {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="id_album")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name ="id_album", nullable = false, unique = true)
     private int idAlbum;
 
     @Column(name ="name")

@@ -16,7 +16,7 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name ="id_order")
+    @Column(name ="id_order", nullable = false, unique = true)
     private int id_order;
 
     @Enumerated(EnumType.STRING)
@@ -74,7 +74,9 @@ public class Order {
         this.stateOrder = stateOrder;
     }
 
-
+    public  int getId(){
+        return id_order;
+    }
 
     public TYPEORDER getType() {
         return type;
