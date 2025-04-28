@@ -36,7 +36,7 @@ public class OrderController {
 //        }
 //    }
 
-    @PostMapping("/fill")
+    @PostMapping("/api/fill")
     public ResponseEntity<?> receiveOrderFilling(@RequestBody Map<String, Object> orderFilling) {
         // Получаем данные из JSON
         int orderId = ((Number) orderFilling.get("order_id")).intValue();  // Получаем ID заказа
