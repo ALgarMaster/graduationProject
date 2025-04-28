@@ -39,7 +39,15 @@ public class OrderController {
     @PostMapping("/api/fill")
     public ResponseEntity<?> receiveOrderFilling(@RequestBody Map<String, Object> orderFilling) {
         // Получаем данные из JSON
-        int orderId = ((Number) orderFilling.get("order_id")).intValue();  // Получаем ID заказа
+        Object orderIdObj = orderFilling.get("order_id");
+        int orderId;  // Получаем ID заказа
+        if (orderIdObj instanceof Number) {
+            orderId = ((Number) orderIdObj).intValue();
+        } else if (orderIdObj instanceof String) {
+            orderId = Integer.parseInt((String) orderIdObj);
+        } else {
+            return ResponseEntity.badRequest().body("Неверный формат order_id");
+        }
         List<Map<String, Object>> filling = (List<Map<String, Object>>) orderFilling.get("filling");  // Получаем товары
         log.info("Айди заказа:"+orderId+". Корзина: ");
 
