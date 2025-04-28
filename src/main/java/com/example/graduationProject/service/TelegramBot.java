@@ -452,57 +452,57 @@ public class TelegramBot extends TelegramLongPollingBot{
                     //команды с цветами
                     case "red":
                         setColorOrderByCallBack(chatID,nickName,RED);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "yellow":
                         setColorOrderByCallBack(chatID,nickName,YELLOW);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "pink":
                         setColorOrderByCallBack(chatID,nickName,PINK);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "green":
                         setColorOrderByCallBack(chatID,nickName,GREEN);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "sky":
                         setColorOrderByCallBack(chatID,nickName,SKY);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "brown":
                         setColorOrderByCallBack(chatID,nickName,BROWN);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "violet":
                         setColorOrderByCallBack(chatID,nickName,VIOLET);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "darkGreen":
                         setColorOrderByCallBack(chatID,nickName,DARK_GREEN);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "purple":
                         setColorOrderByCallBack(chatID,nickName,PURPLE);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "blue":
                         setColorOrderByCallBack(chatID,nickName,BLUE);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
 
                     case "cream":
                         setColorOrderByCallBack(chatID,nickName,CREAM);
-                        webForm(chatID);
+                        webForm(chatID,nickName);
                         break;
                     case "back":
                         backForm(chatID, nickName);
@@ -516,8 +516,10 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
     //TODO нет отрисовки COLOR c не нул, это баг, нужно исправить.
 
-    private void webForm(long chatId){
+    private void webForm(long chatId, String nickName){
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
 
         String Url = "https://vintagenovocherkassk.ru/";
         String messageText = "Перейдите и выберите наполнение подарка или вернитесь назад.";
@@ -526,7 +528,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(messageText);
-        message.setReplyMarkup(inlineKeyboard.webForm(inlineKeyboard, Url));
+        message.setReplyMarkup(inlineKeyboard.webForm(inlineKeyboard, Url, order.getId_order()));
 
         try {
 

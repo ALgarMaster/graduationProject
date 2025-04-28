@@ -49,10 +49,11 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
         return inlineKeyboard;
     }
 
-    public InlineKeyboardMarkup webForm(InlineKeyboardMarkup inlineKeyboard, String Url){
+    public InlineKeyboardMarkup webForm(InlineKeyboardMarkup inlineKeyboard, String Url,  int orderId){
         InlineKeyboardButton chatButton = new InlineKeyboardButton();
         chatButton.setText("Выберите наполнение подарка");
-        chatButton.setWebApp(new WebAppInfo(Url));
+        String urlWithOrderId = Url + "?orderId=" + orderId;
+        chatButton.setWebApp(new WebAppInfo(urlWithOrderId));
         InlineKeyboardButton backButton =  createInlineKeyboardButtonSetTextAndSetCallBack("Назад к заказу", "backToOrder");
         addRowsInLine(backButton,chatButton);
         inlineKeyboard.setKeyboard(rowsInLine);
