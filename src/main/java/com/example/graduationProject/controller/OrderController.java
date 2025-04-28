@@ -26,21 +26,22 @@ public class OrderController {
     private static final Logger log = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
 
-    @PutMapping("/{id}/filling")
-    public void updateFilling(@PathVariable int id, @RequestBody String filling){
-        Order order = getLastOrderByUserId(id);
-        try{
-            orderService.updateFilling(order.getId_order(), filling);
-        }catch (Exception e) {
-            log.error("Ошибка при получении всех продуктов", e);
-        }
-    }
+//    @PutMapping("/{id}/filling")
+//    public void updateFilling(@PathVariable int id, @RequestBody String filling){
+//        Order order = getLastOrderByUserId(id);
+//        try{
+//            orderService.updateFilling(order.getId_order(), filling);
+//        }catch (Exception e) {
+//            log.error("Ошибка при получении всех продуктов", e);
+//        }
+//    }
 
     @PostMapping("/fill")
     public ResponseEntity<?> receiveOrderFilling(@RequestBody Map<String, Object> orderFilling) {
         // Получаем данные из JSON
         int orderId = ((Number) orderFilling.get("order_id")).intValue();  // Получаем ID заказа
         List<Map<String, Object>> filling = (List<Map<String, Object>>) orderFilling.get("filling");  // Получаем товары
+        log.info("Айди заказа:"+orderId+". Корзина: ");
 
         // Найдем заказ по orderId
         Optional<Order> optionalOrder = Optional.ofNullable(orderService.findById(orderId));
