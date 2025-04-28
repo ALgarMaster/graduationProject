@@ -519,7 +519,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     private void webForm(long chatId){
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
-        String Url = "http://192.168.1.228:5173/";
+        String Url = "https://vintagenovocherkassk.ru/";
         String messageText = "Перейдите и выберите наполнение подарка или вернитесь назад.";
 
 
