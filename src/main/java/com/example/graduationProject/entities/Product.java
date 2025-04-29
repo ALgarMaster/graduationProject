@@ -71,6 +71,20 @@ public class Product {
         this.ingredient = ingredient;
         this.unit = false;
     }
+    public Product(int idAlbum, String title, Category category, SubCategory subcategory) {
+        this.idAlbum = idAlbum;
+        this.title = title;
+        this.category = category;
+        this.subcategory = subcategory;
+        this.unit = false;
+    }
+    public Product(int idAlbum, String title, Category category, SubCategory subcategory, boolean unit) {
+        this.idAlbum = idAlbum;
+        this.title = title;
+        this.category = category;
+        this.subcategory = subcategory;
+        this.unit = unit;
+    }
 
     public boolean isUnit() {
         return unit;
