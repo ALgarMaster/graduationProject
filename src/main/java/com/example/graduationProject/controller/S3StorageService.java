@@ -23,7 +23,7 @@ public class S3StorageService {
 
     private final S3Client s3Client = S3Config.createClient(); // ← вот тут мы используем твой конфиг
     private final String bucketName = System.getenv("BUCKET_NAME"); // можно через Dotenv или System.getenv
-    private final String endpointUrl = System.getenv("URI_S3");
+    private final String endpointUrl = "https://storage.yandexcloud.net/";
 
     public void uploadFile(String fileName, InputStream inputStream, long contentLength, String contentType) {
         String safeFileName = fileName.replaceAll("[^a-zA-Z0-9_\\-\\.]", "_");
