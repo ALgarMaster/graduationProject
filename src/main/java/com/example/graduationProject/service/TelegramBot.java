@@ -255,33 +255,23 @@ public class TelegramBot extends TelegramLongPollingBot{
                     break;
                 case "/":
                     break;
-                case "/uploadProductsToDB":
-                    Album album1 = new Album("sencha");
-                    albumService.createAlbum(album1);
+                case "/uploadProductsImageToDB":
+
                     String imagePath1 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\tea\\green\\classic\\Сенча Китай.png";
                     CustomMultipartFile file1 = new CustomMultipartFile(imagePath1);
 
-                    imagesController.uploadImageToS3(file1, album1.getIdAlbum());
-                    Product product1 = new Product(album1.getIdAlbum(), "sencha",TEA,GREEN_TEA);
-                    productController.createProduct(product1);
+                    imagesController.uploadImageToS3(file1, 52);
 
-                    Album album2 = new Album("кофе");
-                    albumService.createAlbum(album2);
                     String imagePath2 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\coffee\\u0ah4a8xdbccfmbomk7d9dcr3uolz8a1.jpg";
                     CustomMultipartFile file2 = new CustomMultipartFile(imagePath2);
 
-                    imagesController.uploadImageToS3(file2, album2.getIdAlbum());
-                    Product product2 = new Product(album2.getIdAlbum(), "кофе",COFFEE,CLASSIC);
-                    productController.createProduct(product2);
+                    imagesController.uploadImageToS3(file2, 53);
 
-                    Album album3 = new Album("шоколад");
-                    albumService.createAlbum(album3);
                     String imagePath3 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\sweats\\23141.jpg";
                     CustomMultipartFile file3 = new CustomMultipartFile(imagePath3);
 
-                    imagesController.uploadImageToS3(file3, album3.getIdAlbum());
-                    Product product3 = new Product(album3.getIdAlbum(), "шоколад",SWEETS,ALL_SWEETS, true);
-                    productController.createProduct(product3);
+                    imagesController.uploadImageToS3(file3, 54);
+
 
 
 

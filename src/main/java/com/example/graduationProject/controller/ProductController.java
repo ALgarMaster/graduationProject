@@ -29,14 +29,12 @@ public class ProductController {
         return "Hello world";
     }
 
-    // Получение одного продукта по ID
     @GetMapping("/api/getAllProducts")
     public ResponseEntity<?> getAllProducts() {
         try {
             List<Product> products = productService.findAll();
 
-            String url = "http://localhost:8080/api/images/";
-            List<Map<String, Object>> moddedProducts = modifyProduct(products, url);
+            List<Map<String, Object>> moddedProducts = modifyProductS3(products);
 
             return ResponseEntity.ok(moddedProducts);
         } catch (Exception e) {
@@ -65,13 +63,16 @@ public class ProductController {
     }
 
 
-    private List<Map<String, Object>> modifyProduct(List<Product> products, String url){
+    private List<Map<String, Object>> modifyProductS3(List<Product> products){
         List<Map<String, Object>> moddedProducts = new ArrayList<>();
 
         products.forEach(product -> {
             Map<String, Object> productMap = new HashMap<>();
             productMap.put("idProduct", product.getIdProduct());
-            productMap.put("images", imagesController.getImagesFileNameByAlbumIdWithUrl(product.getIdAlbum()));
+
+            List<String> imageUrls = imagesController.getImagesURLByAlbumIdS3(product.getIdAlbum());
+            productMap.put("images", imageUrls);
+
             productMap.put("title", product.getTitle());
             productMap.put("category", product.getCategory());
             productMap.put("subcategory",product.getSubcategory());
@@ -83,8 +84,8 @@ public class ProductController {
             moddedProducts.add(productMap);
         });
 
-
         return moddedProducts;
     }
+
 
 }

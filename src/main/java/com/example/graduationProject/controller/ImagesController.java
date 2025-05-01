@@ -213,6 +213,39 @@ public class ImagesController {
         return imageBytesList;
     }
 
+    public List<String> getImagesURLByAlbumIdS3(int albumId) {
+        List<Images> imagesList = imagesService.getImagesByIdAlbum(albumId);
+
+        if (imagesList.isEmpty()) {
+            log.warn("No images found in DB for albumId: {}", albumId);
+            throw new RuntimeException("The image list is empty");
+        }
+
+        List<String> imageUrls = new ArrayList<>();
+
+        for (Images image : imagesList) {
+            String key = image.getFileName();
+            if (key == null || key.isBlank()) {
+                log.warn("Image with id={} has empty S3 key", image.getIdImage());
+                continue;
+            }
+
+            try {
+                String fileUrl = s3StorageService.getFileUrl(key);
+                imageUrls.add(fileUrl);
+            } catch (Exception e) {
+                log.error("Failed to generate URL for S3 key: {}", key, e);
+            }
+        }
+
+        if (imageUrls.isEmpty()) {
+            log.error("No image URLs could be generated from S3 for albumId: {}", albumId);
+            throw new RuntimeException("The image URL list is empty");
+        }
+
+        return imageUrls;
+    }
+
 
     public List<Integer> getImagesFileNameByAlbumIdWithUrl(int id){
         List<Images> imagesList = new ArrayList<>(imagesService.getImagesByIdAlbum(id));
