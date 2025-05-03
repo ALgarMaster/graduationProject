@@ -7,6 +7,9 @@ import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Product;
 import com.example.graduationProject.entities.Stage;
 import com.example.graduationProject.enumeration.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -23,6 +26,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
+import org.telegram.telegrambots.meta.api.objects.webapp.WebAppData;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.*;
@@ -66,7 +70,9 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.albumService = albumService;
         this.productController = productController;
     }
-
+//TODO сделать еще несколько промежуточных этапов: конечный этап,
+//TODO сделать отправку конечного заказа продавцу
+//TODO сделать принятие колбэка с вэбаппа, передача айди чата
     @Override
     public void onUpdateReceived(Update update) {
 
@@ -536,6 +542,46 @@ public class TelegramBot extends TelegramLongPollingBot{
             } catch (Exception e) {
                 log.error("Error handling callback: " + e.getMessage());
             }
+        }else if(update.getMessage() != null && update.getMessage().getWebAppData() != null) {
+            WebAppData webAppData = update.getMessage().getWebAppData();
+            String data = webAppData.getData();
+            Long chatId = update.getMessage().getChatId();
+
+            log.info("Получены данные из WebApp: " + data);
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            try {
+                JsonNode rootNode = mapper.readTree(data);
+
+                int orderId = rootNode.get("order_id").asInt();
+                JsonNode fillingNode = rootNode.get("filling");
+
+                StringBuilder messageBuilder = new StringBuilder();
+                messageBuilder.append("✅ Заказ №").append(orderId).append(" успешно оформлен!\n\n🛒 Состав заказа:\n");
+
+                for (JsonNode item : fillingNode) {
+                    String product = item.get("product").asText();
+                    int quantity = item.get("quantity").asInt();
+                    messageBuilder.append("• ").append(product).append(" — ").append(quantity).append(" шт.\n");
+                }
+
+                SendMessage message = new SendMessage();
+                message.setChatId(chatId.toString());
+                message.setText(messageBuilder.toString());
+
+                execute(message);
+
+            } catch (JsonProcessingException e) {
+                log.error("Ошибка обработки JSON из WebAppData", e);
+                try {
+                    execute(new SendMessage(chatId.toString(), "❌ Произошла ошибка при обработке заказа."));
+                } catch (TelegramApiException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     //TODO нет отрисовки COLOR c не нул, это баг, нужно исправить.
@@ -776,6 +822,8 @@ public class TelegramBot extends TelegramLongPollingBot{
         // Создаем объект клавиатуры с кнопками
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
+        //TODO здесь расположить функцию, которая будет показывать что внутри заказа, какая конфигурация, и какое наполнение
+        //изменить функцию ордера, чтобы она грамотно показывало позицию наполнения
 
         String messageText = "Перейдите по ссылке для подтверждения и оплаты заказа: "+Url;
 
@@ -1300,7 +1348,23 @@ public class TelegramBot extends TelegramLongPollingBot{
 
 
 
-
+//    private void completedOrder(long chatID){
+//        SendMessage message = new SendMessage();
+//        message.setChatId(String.valueOf(chatID));
+//
+//        String textToSend ="";
+//        message.setText(textToSend);
+//
+//        CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
+//        message.setReplyMarkup(inlineKeyboard.addLinkWithButtons(inlineKeyboard));
+//        try {
+//            Message sentMessage = execute(message);
+//            saveMessageIds(chatID, sentMessage.getMessageId());
+//        }catch (TelegramApiException e){
+//            log.error("Error tg exception" + e.getMessage());
+//        }
+//
+//    }
 
 
     private void startCommandReceived(long chatID, String name){
@@ -1315,7 +1379,6 @@ public class TelegramBot extends TelegramLongPollingBot{
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatID));
         message.setText(textToSend);
-//        checkDatabaseConnection();
 
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
