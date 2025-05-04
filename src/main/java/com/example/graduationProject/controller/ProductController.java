@@ -45,9 +45,12 @@ public class ProductController {
 
 
     @GetMapping("/api/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable int id) {
-        Product product = productService.findProductById(id);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<Product> getProductByIdAPI(@PathVariable int id) {
+        return ResponseEntity.ok(getProductById(id));
+    }
+
+    public Product getProductById(int id){
+        return productService.findProductById(id);
     }
 
     @PostMapping("/api/products")

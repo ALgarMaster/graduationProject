@@ -28,8 +28,10 @@ import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.api.objects.webapp.WebAppData;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -349,7 +351,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             try {
                 switch (callbackData) {
                     case "contactseller":
-                        sendMessageWithInlineKeyboard(chatID, "https://t.me/ostukalova");
+                        sendMessageWithInlineKeyboard(chatID, "https://t.me/ostukalova", nickName);
                         break;
                     case "backToOrder":
                         backToOrder(chatID, nickName);
@@ -549,40 +551,41 @@ public class TelegramBot extends TelegramLongPollingBot{
             Long chatId = update.getMessage().getChatId();
 
             log.info("Получены данные из WebApp: " + data);
+            sendMessageWithInlineKeyboard(chatId, "https://t.me/ostukalova", update.getMessage().getFrom().getUserName());
 
-            ObjectMapper mapper = new ObjectMapper();
-
-            try {
-                JsonNode rootNode = mapper.readTree(data);
-
-                int orderId = rootNode.get("order_id").asInt();
-                JsonNode fillingNode = rootNode.get("filling");
-
-                StringBuilder messageBuilder = new StringBuilder();
-                messageBuilder.append("✅ Заказ №").append(orderId).append(" успешно оформлен!\n\n🛒 Состав заказа:\n");
-
-                for (JsonNode item : fillingNode) {
-                    String product = item.get("product").asText();
-                    int quantity = item.get("quantity").asInt();
-                    messageBuilder.append("• ").append(product).append(" — ").append(quantity).append(" шт.\n");
-                }
-
-                SendMessage message = new SendMessage();
-                message.setChatId(chatId.toString());
-                message.setText(messageBuilder.toString());
-
-                execute(message);
-
-            } catch (JsonProcessingException e) {
-                log.error("Ошибка обработки JSON из WebAppData", e);
-                try {
-                    execute(new SendMessage(chatId.toString(), "❌ Произошла ошибка при обработке заказа."));
-                } catch (TelegramApiException ex) {
-                    throw new RuntimeException(ex);
-                }
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
+//            ObjectMapper mapper = new ObjectMapper();
+//
+//            try {
+//                JsonNode rootNode = mapper.readTree(data);
+//
+//                int orderId = rootNode.get("order_id").asInt();
+//                JsonNode fillingNode = rootNode.get("filling");
+//
+//                StringBuilder messageBuilder = new StringBuilder();
+//                messageBuilder.append("✅ Заказ №").append(orderId).append(" успешно оформлен!\n\n🛒 Состав заказа:\n");
+//
+//                for (JsonNode item : fillingNode) {
+//                    String product = item.get("product").asText();
+//                    int quantity = item.get("quantity").asInt();
+//                    messageBuilder.append("• ").append(product).append(" — ").append(quantity).append(" шт.\n");
+//                }
+//
+//                SendMessage message = new SendMessage();
+//                message.setChatId(chatId.toString());
+//                message.setText(messageBuilder.toString());
+//
+//                execute(message);
+//
+//            } catch (JsonProcessingException e) {
+//                log.error("Ошибка обработки JSON из WebAppData", e);
+//                try {
+//                    execute(new SendMessage(chatId.toString(), "❌ Произошла ошибка при обработке заказа."));
+//                } catch (TelegramApiException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            } catch (TelegramApiException e) {
+//                throw new RuntimeException(e);
+//            }
         }
     }
     //TODO нет отрисовки COLOR c не нул, это баг, нужно исправить.
@@ -819,14 +822,18 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    public void sendMessageWithInlineKeyboard(Long chatId, String Url) {
+    public void sendMessageWithInlineKeyboard(Long chatId, String Url, String nickName) {
+
+        int idUsers = usersController.getOrCreateUserByChatId(chatId, nickName);
+        Order order = orderController.getLastOrderByUserId(idUsers);
         // Создаем объект клавиатуры с кнопками
         CustomInlineKeyboardMarkup inlineKeyboard = new CustomInlineKeyboardMarkup();
 
         //TODO здесь расположить функцию, которая будет показывать что внутри заказа, какая конфигурация, и какое наполнение
         //изменить функцию ордера, чтобы она грамотно показывало позицию наполнения
 
-        String messageText = "Перейдите по ссылке для подтверждения и оплаты заказа: "+Url;
+        String orderFill = formatFullOrderMessage(order.getId_order());
+        String messageText = orderFill+"\n"+"Вот контакты продавца, свяжитесь с ним для дальнейшего оформления заказа,\n или ожидайте сообщения, продавец получил ваш заказ и уже приступил к его рассмотрению.\n Контакт продавца для связи: "+Url;
 
         // Создаем объект для отправки сообщения
         SendMessage message = new SendMessage();
@@ -844,6 +851,50 @@ public class TelegramBot extends TelegramLongPollingBot{
             e.printStackTrace(); // Обработка ошибок
         }
     }
+
+    public String formatFullOrderMessage(int idOrder) {
+        Order order = orderController.getOrderById(idOrder);
+        StringBuilder message = new StringBuilder();
+        message.append("Вы собрали заказа:\n");
+        message.append(order.toString()).append("\n"); // Подключаем кастомный toString()
+
+        message.append("📦 Состав заказа:\n");
+        ObjectMapper mapper = new ObjectMapper();
+        BigDecimal totalOrderPrice = BigDecimal.ZERO;
+
+        try {
+            JsonNode fillingArray = mapper.readTree(order.getFilling());
+            for (JsonNode item : fillingArray) {
+                int productId = item.has("product") ? item.get("product").asInt() : -1;
+                int quantity = item.has("quantity") ? item.get("quantity").asInt() : 0;
+
+                if (productId == -1 || quantity == 0) continue;
+
+                Product product = productController.getProductById(productId);
+                if (product == null) {
+                    message.append("• Неизвестный товар (ID: ").append(productId).append(")\n");
+                    continue;
+                }
+
+                BigDecimal price = product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
+                BigDecimal total = price.multiply(BigDecimal.valueOf(quantity));
+                totalOrderPrice = totalOrderPrice.add(total);
+
+                message.append("• ").append(product.getTitle())
+                        .append(" — ").append(quantity).append(product.isUnit() ? " шт." : " г.")
+                        .append(" × ").append(price).append("₽ = ")
+                        .append(total).append("₽\n");
+            }
+        } catch (Exception e) {
+            message.append("⚠️ Ошибка при обработке состава заказа.\n");
+            e.printStackTrace();
+        }
+
+        message.append("\n💰 Общая сумма: ").append(totalOrderPrice).append("₽");
+
+        return message.toString();
+    }
+
 
 
 
