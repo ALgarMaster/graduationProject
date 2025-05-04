@@ -80,6 +80,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             String messageText = update.getMessage().getText();
             long chatID = update.getMessage().getChatId();
             log.info("Chat id: "+ chatID);
+            log.info("🔔 Получен апдейт от Telegram: " + update.toString());
             int idOrder;
             int idUsers ;
             orderIsNullByUserId(chatID, update.getMessage().getFrom().getUserName());
