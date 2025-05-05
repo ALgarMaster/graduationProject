@@ -59,10 +59,9 @@ public class OrderController {
         List<Map<String, Object>> filling = (List<Map<String, Object>>) orderFilling.get("filling");
         log.info("Получен filling: {}", filling);
 
-        // Получаем chatId (если передан с фронта)
         Long chatId = null;
-        if (orderFilling.containsKey("chatId")) {
-            Object chatIdObj = orderFilling.getOrDefault("chatId", orderFilling.get("chat_id"));
+        Object chatIdObj = orderFilling.getOrDefault("chatId", orderFilling.get("chat_id"));
+        if (chatIdObj != null) {
             try {
                 if (chatIdObj instanceof Number) {
                     chatId = ((Number) chatIdObj).longValue();
