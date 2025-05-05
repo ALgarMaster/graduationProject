@@ -12,17 +12,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -31,7 +30,6 @@ public class OrderController {
     private static final Logger log = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
     private final ProductController productController;
-    private final TelegramSenderService telegramSenderService;
 
 
     @PostMapping("/api/fill")
@@ -89,7 +87,24 @@ public class OrderController {
         // Отправка сообщения
         if (chatId != null) {
             String messageText = formatFullOrderMessage(order.getId_order());
-            telegramSenderService.sendTextMessage(chatId, messageText);
+
+
+            String token = System.getenv("BOT_TOKEN");
+
+            String telegramApiUrl = "https://api.telegram.org/bot" + token + "/sendMessage";
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            // Параметры запроса
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("chat_id", chatId);
+            requestBody.put("text", messageText);
+
+            try {
+                restTemplate.postForObject(telegramApiUrl, requestBody, String.class);
+            } catch (Exception e) {
+                log.error("Ошибка при отправке сообщения в Telegram: {}", e.getMessage());
+            }
         }
 
         return ResponseEntity.ok("OK");
