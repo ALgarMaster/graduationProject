@@ -88,7 +88,6 @@ public class OrderController {
         if (chatId != null) {
             String messageText = formatFullOrderMessage(order.getId_order());
 
-
             String token = System.getenv("BOT_TOKEN");
 
             String telegramApiUrl = "https://api.telegram.org/bot" + token + "/sendMessage";
