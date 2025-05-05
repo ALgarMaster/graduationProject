@@ -49,6 +49,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ~/vintageBot/compuseDiplom
-            docker-compose pull backend
             docker-compose down backend
+            docker images "${{ secrets.DOCKER_USERNAME }}/diploma_backend" -q | xargs -r docker rmi -f
+            docker-compose pull backend
             docker-compose up -d --force-recreate backend
