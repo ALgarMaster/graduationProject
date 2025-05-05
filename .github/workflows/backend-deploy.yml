@@ -12,28 +12,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Получить весь git log
 
-      - name: Show last commit message
+      - name: Print last commit message
         run: |
-          echo "::notice::Last commit:"
-          git log -1 --pretty=oneline
+          echo "::group::Git Info"
+          git log -1
+          echo "::endgroup::"
+          echo "::notice::Last commit message:"
+          git log -1 --pretty=%B
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build Docker image (no cache)
-        run: |
-          docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest .
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
-      - name: Inspect built image digest
+      - name: Build Docker image
         run: |
-          echo "::notice::Built image digest:"
-          docker inspect ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest --format='{{index .RepoDigests 0}}'
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest .
 
       - name: Push Docker image to Docker Hub
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest
+
+      - name: Show pushed image digest
+        run: |
+          echo "::notice::Pushed image digest:"
+          docker inspect ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest --format='{{ index .RepoDigests 0 }}'
 
       - name: SSH to Server and Redeploy Backend
         uses: appleboy/ssh-action@v0.1.0
@@ -42,15 +53,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            echo "🧼 Stop and remove old backend"
             cd ~/vintageBot/compuseDiplom
-            docker-compose down backend || true
-
-            echo "🧹 Remove old images"
-            docker image rm -f $(docker images --filter=reference="${{ secrets.DOCKER_USERNAME }}/diploma_backend*" -q) || true
-
-            echo "📥 Pull new image"
+            docker-compose down backend
+            docker images "${{ secrets.DOCKER_USERNAME }}/diploma_backend" -q | xargs -r docker rmi -f
             docker pull ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest
-
-            echo "🚀 Start backend"
             docker-compose up -d --force-recreate backend
