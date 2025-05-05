@@ -69,6 +69,9 @@ public class OrderController {
 
         log.info("Получен заказ. ID: {}, chatId: {}, filling: {}", orderId, chatId, filling);
 
+
+
+
         Optional<Order> optionalOrder = Optional.ofNullable(orderService.findById(orderId));
         if (optionalOrder.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
