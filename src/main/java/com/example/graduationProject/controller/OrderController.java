@@ -33,6 +33,8 @@ public class OrderController {
 
     @PostMapping("/api/fill")
     public ResponseEntity<?> receiveOrderFilling(@RequestBody Map<String, Object> orderFilling) {
+        log.info("Получен запрос на /api/fill: {}", orderFilling);
+
         Object orderIdObj = orderFilling.get("order_id");
         int orderId;
 
@@ -40,17 +42,22 @@ public class OrderController {
         try {
             if (orderIdObj instanceof Number) {
                 orderId = ((Number) orderIdObj).intValue();
+                log.info("order_id успешно получен как число: {}", orderId);
             } else if (orderIdObj instanceof String) {
                 orderId = Integer.parseInt((String) orderIdObj);
+                log.info("order_id успешно получен как строка и преобразован в число: {}", orderId);
             } else {
+                log.warn("Неверный формат order_id: {}", orderIdObj);
                 return ResponseEntity.badRequest().body("Неверный формат order_id");
             }
         } catch (Exception e) {
+            log.error("Ошибка парсинга order_id: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Ошибка парсинга order_id");
         }
 
         // Получаем filling
         List<Map<String, Object>> filling = (List<Map<String, Object>>) orderFilling.get("filling");
+        log.info("Получен filling: {}", filling);
 
         // Получаем chatId (если передан с фронта)
         Long chatId = null;
@@ -59,63 +66,63 @@ public class OrderController {
             try {
                 if (chatIdObj instanceof Number) {
                     chatId = ((Number) chatIdObj).longValue();
+                    log.info("chatId успешно получен как число: {}", chatId);
                 } else if (chatIdObj instanceof String) {
                     chatId = Long.parseLong((String) chatIdObj);
+                    log.info("chatId успешно получен как строка и преобразован в число: {}", chatId);
                 }
             } catch (Exception e) {
                 log.warn("Ошибка парсинга chatId: {}", chatIdObj);
             }
         }
 
-        log.info("Получен заказ. ID: {}, chatId: {}, filling: {}", orderId, chatId, filling);
-
-
-
-
-
-
-
-
-
-
+        log.info("Попытка найти заказ с ID: {}", orderId);
         Optional<Order> optionalOrder = Optional.ofNullable(orderService.findById(orderId));
         if (optionalOrder.isEmpty()) {
+            log.warn("Заказ не найден по ID: {}", orderId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
         }
 
         Order order = optionalOrder.get();
+        log.info("Заказ найден: {}", order);
 
         try {
-            order.setFilling(new ObjectMapper().writeValueAsString(filling));
+            String fillingJson = new ObjectMapper().writeValueAsString(filling);
+            log.info("filling сериализован в JSON: {}", fillingJson);
+            order.setFilling(fillingJson);
             orderService.saveUpdateOrder(order);
+            log.info("Заказ обновлён и сохранён: {}", order);
         } catch (JsonProcessingException e) {
+            log.error("Ошибка сериализации filling: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка обработки данных");
         }
 
         // Отправка сообщения
         if (chatId != null) {
             String messageText = formatFullOrderMessage(order.getId_order());
+            log.info("Формируется сообщение для Telegram: {}", messageText);
 
             String token = System.getenv("BOT_TOKEN");
-
             String telegramApiUrl = "https://api.telegram.org/bot" + token + "/sendMessage";
 
             RestTemplate restTemplate = new RestTemplate();
 
-            // Параметры запроса
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("chat_id", chatId);
             requestBody.put("text", messageText);
 
             try {
                 restTemplate.postForObject(telegramApiUrl, requestBody, String.class);
+                log.info("Сообщение отправлено в Telegram для chatId: {}", chatId);
             } catch (Exception e) {
                 log.error("Ошибка при отправке сообщения в Telegram: {}", e.getMessage());
             }
         }
 
+        log.info("Обработка запроса завершена успешно.");
         return ResponseEntity.ok("OK");
     }
+
 
 
     public String formatFullOrderMessage(int idOrder) {
