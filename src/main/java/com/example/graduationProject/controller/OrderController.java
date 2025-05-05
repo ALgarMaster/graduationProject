@@ -4,7 +4,6 @@ import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Product;
 import com.example.graduationProject.enumeration.*;
 import com.example.graduationProject.service.OrderService;
-import com.example.graduationProject.service.TelegramSenderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
