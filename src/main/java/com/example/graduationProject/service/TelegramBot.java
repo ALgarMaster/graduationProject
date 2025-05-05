@@ -545,47 +545,6 @@ public class TelegramBot extends TelegramLongPollingBot{
             } catch (Exception e) {
                 log.error("Error handling callback: " + e.getMessage());
             }
-        }else if(update.getMessage() != null && update.getMessage().getWebAppData() != null) {
-            WebAppData webAppData = update.getMessage().getWebAppData();
-            String data = webAppData.getData();
-            Long chatId = update.getMessage().getChatId();
-
-            log.info("Получены данные из WebApp: " + data);
-            sendMessageWithInlineKeyboard(chatId, "https://t.me/ostukalova", update.getMessage().getFrom().getUserName());
-
-//            ObjectMapper mapper = new ObjectMapper();
-//
-//            try {
-//                JsonNode rootNode = mapper.readTree(data);
-//
-//                int orderId = rootNode.get("order_id").asInt();
-//                JsonNode fillingNode = rootNode.get("filling");
-//
-//                StringBuilder messageBuilder = new StringBuilder();
-//                messageBuilder.append("✅ Заказ №").append(orderId).append(" успешно оформлен!\n\n🛒 Состав заказа:\n");
-//
-//                for (JsonNode item : fillingNode) {
-//                    String product = item.get("product").asText();
-//                    int quantity = item.get("quantity").asInt();
-//                    messageBuilder.append("• ").append(product).append(" — ").append(quantity).append(" шт.\n");
-//                }
-//
-//                SendMessage message = new SendMessage();
-//                message.setChatId(chatId.toString());
-//                message.setText(messageBuilder.toString());
-//
-//                execute(message);
-//
-//            } catch (JsonProcessingException e) {
-//                log.error("Ошибка обработки JSON из WebAppData", e);
-//                try {
-//                    execute(new SendMessage(chatId.toString(), "❌ Произошла ошибка при обработке заказа."));
-//                } catch (TelegramApiException ex) {
-//                    throw new RuntimeException(ex);
-//                }
-//            } catch (TelegramApiException e) {
-//                throw new RuntimeException(e);
-//            }
         }
     }
     //TODO нет отрисовки COLOR c не нул, это баг, нужно исправить.
