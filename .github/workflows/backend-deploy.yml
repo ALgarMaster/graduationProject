@@ -51,5 +51,5 @@ jobs:
             cd ~/vintageBot/compuseDiplom
             docker-compose down backend
             docker images "${{ secrets.DOCKER_USERNAME }}/diploma_backend" -q | xargs -r docker rmi -f
-            docker-compose pull backend
+            docker pull --quiet --disable-content-trust=false stassrc/diploma_backend:latest
             docker-compose up -d --force-recreate backend
