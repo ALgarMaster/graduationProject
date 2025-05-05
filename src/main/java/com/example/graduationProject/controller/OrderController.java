@@ -98,7 +98,7 @@ public class OrderController {
 
         // Отправка сообщения
         if (chatId != null) {
-            String messageText = formatFullOrderMessage(order.getId_order());
+            String messageText = formatFullOrderMessage(orderId);
             log.info("Формируется сообщение для Telegram: {}", messageText);
 
             String token = System.getenv("BOT_TOKEN");
@@ -125,10 +125,19 @@ public class OrderController {
 
 
     public String formatFullOrderMessage(int idOrder) {
+        log.info("Формирование полного сообщения по заказу с ID: {}", idOrder);
+
         Order order = getOrderById(idOrder);
+        if (order == null) {
+            log.warn("Заказ с ID {} не найден.", idOrder);
+            return "❌ Заказ не найден.";
+        }
+
+        log.debug("Заказ найден: {}", order);
+
         StringBuilder message = new StringBuilder();
         message.append("Вы собрали заказа:\n");
-        message.append(order.toString()).append("\n"); // Подключаем кастомный toString()
+        message.append(order.toString()).append("\n");
 
         message.append("📦 Состав заказа:\n");
         ObjectMapper mapper = new ObjectMapper();
@@ -136,15 +145,23 @@ public class OrderController {
 
         try {
             JsonNode fillingArray = mapper.readTree(order.getFilling());
+            log.debug("Состав заказа успешно десериализован: {}", fillingArray);
+
             for (JsonNode item : fillingArray) {
                 int productId = item.has("product") ? item.get("product").asInt() : -1;
                 int quantity = item.has("quantity") ? item.get("quantity").asInt() : 0;
 
-                if (productId == -1 || quantity == 0) continue;
+                log.debug("Обработка позиции: productId={}, quantity={}", productId, quantity);
+
+                if (productId == -1 || quantity == 0) {
+                    log.warn("Пропуск некорректной позиции: productId={}, quantity={}", productId, quantity);
+                    continue;
+                }
 
                 Product product = productController.getProductById(productId);
                 if (product == null) {
                     message.append("• Неизвестный товар (ID: ").append(productId).append(")\n");
+                    log.warn("Продукт с ID {} не найден", productId);
                     continue;
                 }
 
@@ -152,20 +169,24 @@ public class OrderController {
                 BigDecimal total = price.multiply(BigDecimal.valueOf(quantity));
                 totalOrderPrice = totalOrderPrice.add(total);
 
+                log.debug("Добавление товара в сообщение: {} x {} = {}", product.getTitle(), quantity, total);
+
                 message.append("• ").append(product.getTitle())
                         .append(" — ").append(quantity).append(product.isUnit() ? " шт." : " г.")
                         .append(" × ").append(price).append("₽ = ")
                         .append(total).append("₽\n");
             }
         } catch (Exception e) {
+            log.error("Ошибка при обработке состава заказа: {}", e.getMessage(), e);
             message.append("⚠️ Ошибка при обработке состава заказа.\n");
-            e.printStackTrace();
         }
 
         message.append("\n💰 Общая сумма: ").append(totalOrderPrice).append("₽");
 
+        log.info("Сообщение по заказу {} успешно сформировано", idOrder);
         return message.toString();
     }
+
 
     public Order getOrderById(int id){
         return orderService.findById(id);
