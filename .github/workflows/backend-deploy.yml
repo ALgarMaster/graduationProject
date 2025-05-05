@@ -2,11 +2,6 @@ name: Deploy Backend to Server
 
 on:
   push:
-    branches-ignore:
-      - 'ignore-this-branch'
-    paths:
-      - 'graduationProject/**'
-      - '.github/workflows/backend-deploy.yml'
   workflow_dispatch:
 
 jobs:
@@ -40,7 +35,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest graduationProject
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest .
 
       - name: Push Docker image to Docker Hub
         run: |
