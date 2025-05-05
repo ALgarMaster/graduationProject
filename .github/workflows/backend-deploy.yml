@@ -2,11 +2,6 @@ name: Deploy Backend to Server
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'graduationProject/**'
-      - '.github/workflows/backend-deploy.yml'
   workflow_dispatch:
 
 jobs:
@@ -15,16 +10,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Получить весь git log
 
-      - name: Get last commit message
+      - name: Print last commit message
         run: |
-          LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "Last commit message: $LAST_COMMIT_MESSAGE"
+          echo "::group::Git Info"
+          git log -1
+          echo "::endgroup::"
+          echo "::notice::Last commit message:"
+          git log -1 --pretty=%B
 
       - name: Log in to Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Cache Docker layers
         uses: actions/cache@v3
