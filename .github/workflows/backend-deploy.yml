@@ -41,6 +41,11 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest
 
+      - name: Show pushed image digest
+        run: |
+          echo "::notice::Pushed image digest:"
+          docker inspect ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest --format='{{ index .RepoDigests 0 }}'
+
       - name: SSH to Server and Redeploy Backend
         uses: appleboy/ssh-action@v0.1.0
         with:
@@ -51,5 +56,5 @@ jobs:
             cd ~/vintageBot/compuseDiplom
             docker-compose down backend
             docker images "${{ secrets.DOCKER_USERNAME }}/diploma_backend" -q | xargs -r docker rmi -f
-            docker-compose pull backend
+            docker pull ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest
             docker-compose up -d --force-recreate backend
