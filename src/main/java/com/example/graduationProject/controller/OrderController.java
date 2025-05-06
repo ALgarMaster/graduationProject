@@ -148,7 +148,7 @@ public class OrderController {
             log.debug("Состав заказа успешно десериализован: {}", fillingArray);
 
             for (JsonNode item : fillingArray) {
-                int productId = item.has("product") ? item.get("product").asInt() : -1;
+                int productId = item.has("product_id") ? item.get("product_id").asInt() : -1;
                 int quantity = item.has("quantity") ? item.get("quantity").asInt() : 0;
 
                 log.debug("Обработка позиции: productId={}, quantity={}", productId, quantity);
