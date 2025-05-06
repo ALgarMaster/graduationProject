@@ -3,6 +3,7 @@ package com.example.graduationProject.controller;
 import com.example.graduationProject.entities.Order;
 import com.example.graduationProject.entities.Product;
 import com.example.graduationProject.enumeration.*;
+import com.example.graduationProject.service.CustomInlineKeyboardMarkup;
 import com.example.graduationProject.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -96,9 +98,11 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка обработки данных");
         }
 
-        // Отправка сообщения
         if (chatId != null) {
-            String messageText = formatFullOrderMessage(orderId);
+            String messageText = formatFullOrderMessage(orderId)
+                    + "\n\nСвяжитесь с продавцом, для  завершения заказа."
+                    + "\nЕсли вы хотите изменить заказ, то нажмите на кнопку назад."
+                    + "\nПродавец вас ждет или напишет чуть позже. Спасибо за ваш заказ!";
             log.info("Формируется сообщение для Telegram: {}", messageText);
 
             String token = System.getenv("BOT_TOKEN");
@@ -106,17 +110,29 @@ public class OrderController {
 
             RestTemplate restTemplate = new RestTemplate();
 
+            // 👉 Используем твой CustomInlineKeyboardMarkup
+            CustomInlineKeyboardMarkup customKeyboard = new CustomInlineKeyboardMarkup();
+            InlineKeyboardMarkup keyboard = customKeyboard.addLinkWithButtons(new InlineKeyboardMarkup(), "https://t.me/ostukalova");
+
+            // 👉 Сериализация клавиатуры в Map
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> replyMarkup = objectMapper.convertValue(keyboard, Map.class);
+
+            // 👉 Формируем тело запроса
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("chat_id", chatId);
             requestBody.put("text", messageText);
+            requestBody.put("reply_markup", replyMarkup);
 
             try {
                 restTemplate.postForObject(telegramApiUrl, requestBody, String.class);
-                log.info("Сообщение отправлено в Telegram для chatId: {}", chatId);
+                log.info("Сообщение с кнопками отправлено в Telegram для chatId: {}", chatId);
             } catch (Exception e) {
                 log.error("Ошибка при отправке сообщения в Telegram: {}", e.getMessage());
             }
         }
+
+
 
         log.info("Обработка запроса завершена успешно.");
         return ResponseEntity.ok("OK");

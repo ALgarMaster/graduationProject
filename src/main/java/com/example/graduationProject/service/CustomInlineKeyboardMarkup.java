@@ -15,7 +15,7 @@ public class CustomInlineKeyboardMarkup extends InlineKeyboardMarkup {
     List<List<InlineKeyboardButton>> rowsInLine;
 
 
-    CustomInlineKeyboardMarkup(){
+    public CustomInlineKeyboardMarkup(){
         rowsInLine = new ArrayList<>();
     }
 
