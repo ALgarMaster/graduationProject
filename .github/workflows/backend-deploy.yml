@@ -12,15 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Получить весь git log
+          fetch-depth: 0
 
-      - name: Print last commit message
-        run: |
-          echo "::group::Git Info"
-          git log -1
-          echo "::endgroup::"
-          echo "::notice::Last commit message:"
-          git log -1 --pretty=%B
+      - name: Get short commit SHA
+        id: vars
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -33,13 +29,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build Docker image
+      - name: Build Docker image with SHA and latest tags
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest \
+                       -t ${{ secrets.DOCKER_USERNAME }}/diploma_backend:${{ env.SHORT_SHA }} .
 
-      - name: Push Docker image to Docker Hub
+      - name: Push both image tags
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/diploma_backend:${{ env.SHORT_SHA }}
 
       - name: Show pushed image digest
         run: |
