@@ -44,6 +44,9 @@ jobs:
           echo "::notice::Pushed image digest:"
           docker inspect ${{ secrets.DOCKER_USERNAME }}/diploma_backend:latest --format='{{ index .RepoDigests 0 }}'
 
+      - name: Wait for 15 seconds before deploy
+        run: sleep 15
+
       - name: SSH to Server and Redeploy Backend
         uses: appleboy/ssh-action@v0.1.0
         with:
