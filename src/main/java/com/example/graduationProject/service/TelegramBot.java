@@ -226,17 +226,6 @@ public class TelegramBot extends TelegramLongPollingBot{
 //                    CustomMultipartFile file15 = new CustomMultipartFile(imagePath15);
 //                    imagesController.uploadImageToS3(file15, 11);
 //
-//// Загрузка шестнадцатого файла в альбом с ID 65
-//                    String imagePath16 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\type.png";
-//                    CustomMultipartFile file16 = new CustomMultipartFile(imagePath16);
-//                    imagesController.uploadImageToS3(file16, 1);
-//
-//                    // Загрузка шестнадцатого файла в альбом с ID 65
-//                    String imagePath17 = "C:\\Users\\Stanislav\\Desktop\\images_for_project\\bot\\type.png";
-//                    CustomMultipartFile file17 = new CustomMultipartFile(imagePath17);
-//                    imagesController.uploadImageToS3(file17, 0);
-//
-//                    break;
 
                 case "/probeGetImageS3":
 
@@ -280,11 +269,6 @@ public class TelegramBot extends TelegramLongPollingBot{
                     CustomMultipartFile file3 = new CustomMultipartFile(imagePath3);
 
                     imagesController.uploadImageToS3(file3, 54);
-
-
-
-
-
                     break;
 //                case "/probeQueryImagesByAlbumId0":
 //                    try {
